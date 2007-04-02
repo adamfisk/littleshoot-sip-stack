@@ -1,0 +1,82 @@
+package org.lastbamboo.platform.sip.stack.message.header;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+/**
+ * Bean for a single SIP header.
+ */
+public class SipHeaderImpl implements SipHeader
+    {
+
+    private static final Log LOG = LogFactory.getLog(SipHeaderImpl.class);
+    
+    private final String m_headerName;
+    private final List m_headerValues;
+
+    /**
+     * Creates a new SIP header with the specified name and values.
+     * 
+     * @param headerName The name of the header.  
+     * @param headerValues The values of the header.
+     */
+    public SipHeaderImpl(final String headerName, final List headerValues)
+        {
+        if (LOG.isDebugEnabled())
+            {
+            LOG.debug("Creating header with "+headerValues.size()+" values...");
+            }
+        this.m_headerName = headerName;
+        this.m_headerValues = headerValues;
+        }
+
+    /**
+     * Creates a new SIP header with the specified name and value.
+     * 
+     * @param headerName The name of the header.  
+     * @param headerValue The value of the header.
+     */
+    public SipHeaderImpl(final String headerName, 
+        final SipHeaderValue headerValue)
+        {
+        this(headerName, createValues(headerValue));
+        }
+    
+    private static List createValues(final SipHeaderValue headerValue)
+        {
+        final List values = new ArrayList();
+        values.add(headerValue);
+        return values;
+        }
+
+    public String getName()
+        {
+        return this.m_headerName;
+        }
+    
+    public List getValues()
+        {
+        synchronized(this.m_headerValues)
+            {
+            return new ArrayList(this.m_headerValues);
+            }
+        }
+    
+    public SipHeaderValue getValue()
+        {
+        return (SipHeaderValue) this.m_headerValues.get(0);
+        }
+    
+    public void addValue(final SipHeaderValue headerValue)
+        {
+        this.m_headerValues.add(0, headerValue);
+        }
+    
+    public String toString()
+        {
+        return this.m_headerName + ": " + getValues();
+        }
+    }
