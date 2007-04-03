@@ -13,6 +13,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.lastbamboo.common.protocol.CloseListener;
+import org.lastbamboo.common.protocol.ReaderWriter;
+import org.lastbamboo.common.protocol.ReaderWriterUtils;
+import org.lastbamboo.common.protocol.WriteData;
+import org.lastbamboo.common.protocol.WriteListener;
 import org.lastbamboo.platform.sip.stack.message.SipMessage;
 import org.lastbamboo.platform.sip.stack.message.SipMessageFactory;
 import org.lastbamboo.platform.sip.stack.message.SipMessageUtils;
@@ -21,11 +26,6 @@ import org.lastbamboo.platform.sip.stack.message.header.SipHeaderFactory;
 import org.lastbamboo.platform.sip.stack.transaction.SipClientTransaction;
 import org.lastbamboo.platform.sip.stack.transaction.SipTransactionFactory;
 import org.lastbamboo.platform.sip.stack.transaction.SipTransactionListener;
-import org.lastbamboo.shoot.protocol.CloseListener;
-import org.lastbamboo.shoot.protocol.ReaderWriter;
-import org.lastbamboo.shoot.protocol.ReaderWriterUtils;
-import org.lastbamboo.shoot.protocol.WriteData;
-import org.lastbamboo.shoot.protocol.WriteListener;
 
 /**
  * The transport layer implementation for TCP.

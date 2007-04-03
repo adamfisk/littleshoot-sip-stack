@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Collection;
 
+import org.lastbamboo.common.protocol.ReaderWriter;
 import org.lastbamboo.platform.sip.stack.message.SipMessage;
 import org.lastbamboo.platform.sip.stack.transaction.SipClientTransaction;
 import org.lastbamboo.platform.sip.stack.transaction.SipTransactionListener;
-import org.lastbamboo.shoot.protocol.ReaderWriter;
 
 /**
  * Interface for calls to the TCP transport layer, as specified in section

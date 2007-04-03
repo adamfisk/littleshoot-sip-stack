@@ -3,6 +3,7 @@ package org.lastbamboo.platform.sip.stack.transport;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
+import org.lastbamboo.common.protocol.ReaderWriter;
 import org.lastbamboo.platform.sip.stack.message.SipMessageFactory;
 import org.lastbamboo.platform.sip.stack.message.SipMessageFactoryImpl;
 import org.lastbamboo.platform.sip.stack.message.header.SipHeaderFactory;
@@ -13,7 +14,6 @@ import org.lastbamboo.platform.sip.stack.transaction.SipTransactionFactory;
 import org.lastbamboo.platform.sip.stack.transaction.SipTransactionFactoryImpl;
 import org.lastbamboo.platform.sip.stack.transaction.SipTransactionTracker;
 import org.lastbamboo.platform.sip.stack.transaction.SipTransactionTrackerImpl;
-import org.lastbamboo.shoot.protocol.ReaderWriter;
 
 import junit.framework.TestCase;
 

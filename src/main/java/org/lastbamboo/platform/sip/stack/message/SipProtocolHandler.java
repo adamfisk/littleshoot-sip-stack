@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.lastbamboo.shoot.protocol.ProtocolHandler;
+import org.lastbamboo.common.protocol.ProtocolHandler;
 
 /**
  * Abstract class for reading SIP messages from byte buffers.
