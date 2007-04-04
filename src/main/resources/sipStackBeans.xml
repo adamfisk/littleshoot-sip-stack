@@ -3,48 +3,48 @@
 
 <beans>
 
-	<!--
+    <!--
         URI utilities.
     -->
-    <bean id="uriUtils" class="org.lastbamboo.platform.sip.stack.util.UriUtilsImpl">
+    <bean id="uriUtils" class="org.lastbamboo.common.sip.stack.util.UriUtilsImpl">
         </bean>
-        
+
     <!--
         The factory for creating SIP message headers.
     -->
     <bean id="sipHeaderFactory"
-          class="org.lastbamboo.platform.sip.stack.message.header.SipHeaderFactoryImpl">
+          class="org.lastbamboo.common.sip.stack.message.header.SipHeaderFactoryImpl">
         </bean>
-           
+
     <!--
         The factory for creating SIP messages.
     -->
     <bean id="sipMessageFactory"
-          class="org.lastbamboo.platform.sip.stack.message.SipMessageFactoryImpl">
+          class="org.lastbamboo.common.sip.stack.message.SipMessageFactoryImpl">
         <constructor-arg><ref local="sipHeaderFactory"/></constructor-arg>
         </bean>
-  
+
     <!--
         The factory for creating SIP transactions.
     -->
     <bean id="sipTransactionTracker"
-          class="org.lastbamboo.platform.sip.stack.transaction.SipTransactionTrackerImpl">
+          class="org.lastbamboo.common.sip.stack.transaction.SipTransactionTrackerImpl">
         </bean>
-        
+
     <!--
         The factory for creating SIP transactions.
     -->
     <bean id="sipTransactionFactory"
-          class="org.lastbamboo.platform.sip.stack.transaction.SipTransactionFactoryImpl">
+          class="org.lastbamboo.common.sip.stack.transaction.SipTransactionFactoryImpl">
     	<constructor-arg><ref local="sipTransactionTracker"/></constructor-arg>
        	<constructor-arg><ref local="sipMessageFactory"/></constructor-arg>
        	<constructor-arg><value>500</value></constructor-arg>
         </bean>
-        
+
    	<bean id="sipTransportLayer"
-   		  class="org.lastbamboo.platform.sip.stack.transport.SipTcpTransportLayerImpl">
+              class="org.lastbamboo.common.sip.stack.transport.SipTcpTransportLayerImpl">
    		<constructor-arg><ref local="sipTransactionFactory"/></constructor-arg>
        	<constructor-arg><ref local="sipHeaderFactory"/></constructor-arg>
        	<constructor-arg><ref local="sipMessageFactory"/></constructor-arg>
-   		</bean>
-</beans>
+        </bean>
+    </beans>
