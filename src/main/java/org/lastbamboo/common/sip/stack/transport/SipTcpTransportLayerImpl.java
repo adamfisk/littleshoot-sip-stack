@@ -26,6 +26,7 @@ import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
 import org.lastbamboo.common.sip.stack.transaction.SipClientTransaction;
 import org.lastbamboo.common.sip.stack.transaction.SipTransactionFactory;
 import org.lastbamboo.common.sip.stack.transaction.SipTransactionListener;
+import org.lastbamboo.common.util.NetworkUtils;
 
 /**
  * The transport layer implementation for TCP.
@@ -123,7 +124,7 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
     private SipMessage addVia(final SipMessage request) 
         throws UnknownHostException
         {
-        final InetAddress localHost = InetAddress.getLocalHost();
+        final InetAddress localHost = NetworkUtils.getLocalHost();
         final SipHeader via = this.m_headerFactory.createSentByVia(localHost);
         
         return this.m_messageFactory.addVia(request, via);
