@@ -26,7 +26,9 @@ import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
 import org.lastbamboo.common.sip.stack.transaction.SipClientTransaction;
 import org.lastbamboo.common.sip.stack.transaction.SipTransactionFactory;
 import org.lastbamboo.common.sip.stack.transaction.SipTransactionListener;
+import org.lastbamboo.common.util.ByteBufferUtils;
 import org.lastbamboo.common.util.NetworkUtils;
+import org.springframework.util.Assert;
 
 /**
  * The transport layer implementation for TCP.
@@ -177,6 +179,12 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
             LOG.debug("Writing message: "+message);
             }
         final ByteBuffer buf = message.toByteBuffer();
+        
+        if (LOG.isDebugEnabled())
+            {
+            final String bufString = ByteBufferUtils.toString(buf);
+            Assert.isTrue(bufString.equals(message.toString()));
+            }
         readerWriter.writeLater(buf, this);
         }
 
