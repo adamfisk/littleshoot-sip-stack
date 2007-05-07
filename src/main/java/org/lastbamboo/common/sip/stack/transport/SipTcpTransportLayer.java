@@ -22,7 +22,7 @@ public interface SipTcpTransportLayer
      * 
      * @param readerWriter The connection to the host.
      */
-    void addConnection(final ReaderWriter readerWriter);
+    void addConnection(ReaderWriter readerWriter);
 
     /**
      * Writes a message that is a part of a transaction.  This method should
@@ -35,8 +35,8 @@ public interface SipTcpTransportLayer
      * @param listener Class that listens for transaction events.
      * @return The client transaction for the request.
      */
-    SipClientTransaction writeRequest(final SipMessage message, 
-        final ReaderWriter readerWriter, final SipTransactionListener listener);
+    SipClientTransaction writeRequest(SipMessage message, 
+        ReaderWriter readerWriter, SipTransactionListener listener);
 
     /**
      * Writes the specified request without creating a transaction.
@@ -58,8 +58,7 @@ public interface SipTcpTransportLayer
      * response and passed it to the network for transport, otherwise 
      * <code>false</code>.
      */
-    boolean writeResponse(final InetSocketAddress socketAddress, 
-        final SipMessage response);
+    boolean writeResponse(InetSocketAddress socketAddress, SipMessage response);
 
     /**
      * Writes a response using the routing information in the topmost Via 
@@ -68,7 +67,7 @@ public interface SipTcpTransportLayer
      * @param response The response to write.
      * @throws IOException If we could not route the response for any reason.
      */
-    void writeResponse(final SipMessage response) throws IOException;
+    void writeResponse(SipMessage response) throws IOException;
 
     /**
      * Checks whether or not the transport layer has a connection to any
@@ -78,7 +77,7 @@ public interface SipTcpTransportLayer
      * @return <code>true</code> if there is a connection to any of the 
      * specified addresses, otherwise <code>false</code>.
      */
-    boolean hasConnectionForAny(final Collection socketAddresses);
+    boolean hasConnectionForAny(Collection socketAddresses);
 
     /**
      * Writes the specified request to the first address in the collection
@@ -88,7 +87,16 @@ public interface SipTcpTransportLayer
      * message to.
      * @param request The request to send.
      */
-    void writeRequest(final Collection socketAddresses, 
-        final SipMessage request);
+    void writeRequest(Collection socketAddresses, SipMessage request);
+
+    /**
+     * Writes a CRLF keep-alive message to the given reader/writer, as
+     * specified in the SIP outbound drafts.  The keep-alive both keeps NATs
+     * from closing active connections and supplies insurance to detect when
+     * connections have been closed.
+     * 
+     * @param readerWriter The reader/writer to write the messages over.
+     */
+    void writeCrlfKeepAlive(ReaderWriter readerWriter);
 
     }

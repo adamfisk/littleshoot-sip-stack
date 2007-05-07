@@ -1,6 +1,7 @@
 package org.lastbamboo.common.sip.stack.transport;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -185,6 +186,27 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
             final String bufString = ByteBufferUtils.toString(buf);
             Assert.isTrue(bufString.equals(message.toString()));
             }
+        readerWriter.writeLater(buf, this);
+        }
+    
+    public void writeCrlfKeepAlive(final ReaderWriter readerWriter)
+        {
+        if (LOG.isDebugEnabled())
+            {
+            LOG.debug("Writing double CRLF");
+            }
+        final String doubleCrlf = "\r\n\r\n";
+        final ByteBuffer buf;
+        try
+            {
+            buf = ByteBuffer.wrap(doubleCrlf.getBytes("US-ASCII"));
+            }
+        catch (final UnsupportedEncodingException e)
+            {
+            LOG.error("Bad encoding??", e);
+            return;
+            }
+
         readerWriter.writeLater(buf, this);
         }
 
