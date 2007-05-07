@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.lastbamboo.common.sip.stack.message.SipMessage;
 import org.lastbamboo.common.sip.stack.message.SipMessageVisitor;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
@@ -28,8 +29,7 @@ public class SipMessageStub implements SipMessage
 
     public byte[] getBytes()
         {
-        // TODO Auto-generated method stub
-        return null;
+        return ArrayUtils.EMPTY_BYTE_ARRAY;
         }
 
     public SipHeader getHeader(String headerName)
@@ -46,7 +46,7 @@ public class SipMessageStub implements SipMessage
 
     public ByteBuffer toByteBuffer()
         {
-        return ByteBuffer.allocate(0);
+        return ByteBuffer.wrap(getBytes());
         }
 
     public byte[] getBody()
@@ -79,4 +79,8 @@ public class SipMessageStub implements SipMessage
         return null;
         }
 
+    public String toString()
+        {
+        return new String(getBytes());
+        }
     }

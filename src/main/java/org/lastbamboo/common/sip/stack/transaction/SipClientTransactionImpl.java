@@ -7,6 +7,7 @@ import java.util.TimerTask;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.lastbamboo.common.sip.stack.message.DoubleCrlfKeepAlive;
 import org.lastbamboo.common.sip.stack.message.Invite;
 import org.lastbamboo.common.sip.stack.message.OkResponse;
 import org.lastbamboo.common.sip.stack.message.Register;
@@ -159,5 +160,10 @@ public class SipClientTransactionImpl implements SipClientTransaction
         {
         LOG.warn("Should not receive unknown messages on client " +
             "transactions: "+request);
+        }
+
+    public void visitDoubleCrlfKeepAlive(final DoubleCrlfKeepAlive keepAlive)
+        {
+        LOG.warn("Should not receive double CRLF keep alives on the client");
         }
     }

@@ -40,4 +40,13 @@ public interface SipMessageVisitor
      * @param request A request we do not recognize.
      */
     void visitUnknownRequest(final UnknownMessage request);
+
+    /**
+     * Visits a double CRLF keep alive message, as specified at:<p>
+     * 
+     * http://www.ietf.org/internet-drafts/draft-ietf-sip-outbound-08.txt<p>
+     * 
+     * @param keepAlive The keep alive message.
+     */
+    void visitDoubleCrlfKeepAlive(DoubleCrlfKeepAlive keepAlive);
     }

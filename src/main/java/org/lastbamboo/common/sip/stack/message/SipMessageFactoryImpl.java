@@ -118,7 +118,7 @@ public class SipMessageFactoryImpl implements SipMessageFactory
         final Matcher matcher = METHOD_WHITESPACE.matcher(requestLine);
         if (!matcher.find())
             {
-            throw new IOException("Invalid SIP request line: "+requestLine);
+            throw new IOException("Invalid SIP request line: '"+requestLine+"'");
             }
         
         final String method = matcher.group(1);
@@ -400,6 +400,10 @@ public class SipMessageFactoryImpl implements SipMessageFactory
     public SipMessage createSipMessage(final String messageString) 
         throws IOException  
         {
+        if (messageString.startsWith("\r\n\r\n"))
+            {
+            return new DoubleCrlfKeepAlive();
+            }
         final BufferedReader reader = 
             new BufferedReader(new StringReader(messageString));
         

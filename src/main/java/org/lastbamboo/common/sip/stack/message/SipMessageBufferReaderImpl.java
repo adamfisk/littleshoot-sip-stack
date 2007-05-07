@@ -1,7 +1,6 @@
 package org.lastbamboo.common.sip.stack.message;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
@@ -96,7 +95,7 @@ public class SipMessageBufferReaderImpl implements SipMessageBufferReader
             final long startTime = System.currentTimeMillis();
             if (LOG.isDebugEnabled())
                 {
-                LOG.debug("Reading message string:\n"+messageString);
+                LOG.debug("Reading message string:\n'"+messageString+"'");
                 LOG.debug("Total string length: "+messageString.length());
                 }
             final SipMessage message;
@@ -138,6 +137,11 @@ public class SipMessageBufferReaderImpl implements SipMessageBufferReader
                 final long totalTime = endTime-startTime;
                 this.m_totalMessages++;
                 this.m_totalTime += totalTime;
+                
+                if (totalTime > 2 * 1000)
+                    {
+                    LOG.warn("Took "+totalTime+" ms to process message...");
+                    }
                 if (LOG.isDebugEnabled())
                     {
                     LOG.debug("Processed "+message.getMethod()+
@@ -153,15 +157,9 @@ public class SipMessageBufferReaderImpl implements SipMessageBufferReader
                 LOG.warn("Error reading message!!", e);
                 // TODO: Send a message back saying we could not understand 
                 // the message, and then close the connection.
-                try
-                    {
-                    return ByteBuffer.wrap(messageString.getBytes("US-ASCII"));
-                    }
-                catch (final UnsupportedEncodingException uee)
-                    {
-                    LOG.error("Should never happen", uee);
-                    return null;
-                    }
+                return ByteBuffer.wrap(
+                    org.lastbamboo.common.util.StringUtils.toAsciiBytes(
+                        messageString));
                 }
             
             if (LOG.isDebugEnabled())

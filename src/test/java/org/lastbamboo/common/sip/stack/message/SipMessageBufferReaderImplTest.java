@@ -7,6 +7,9 @@ import java.nio.charset.CharsetDecoder;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.lastbamboo.common.sip.stack.message.Invite;
 import org.lastbamboo.common.sip.stack.message.OkResponse;
 import org.lastbamboo.common.sip.stack.message.Register;
@@ -26,6 +29,9 @@ import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactoryImpl;
 public class SipMessageBufferReaderImplTest extends TestCase 
     implements SipMessageVisitor
     {
+    
+    private static final Log LOG = 
+        LogFactory.getLog(SipMessageBufferReaderImplTest.class);
 
     private final String m_fullMessageString = 
         "INVITE sip:1@lastbamboo.org SIP/2.0\r\n" +
@@ -47,6 +53,14 @@ public class SipMessageBufferReaderImplTest extends TestCase
         "m=audio 3456 RTP/AVP 0 1 3 99\r\n" +
         "a=rtpmap:0 PCMU/8000\r\n";
     private int m_numInvitesReceived;
+    private int m_numDoubleCrlfsReceived;
+    
+    
+    public void tearDown() throws Exception
+        {
+        this.m_numInvitesReceived = 0;
+        this.m_numDoubleCrlfsReceived = 0;
+        }
     
     /**
      * Test buffer reading with a focus on partial buffers.
@@ -119,7 +133,7 @@ public class SipMessageBufferReaderImplTest extends TestCase
      * 
      * @throws Exception If any unexpected error occurs.
      */
-    public void testManyMessagesInFirstBuffer() throws Exception
+    public void testManyMessagesInBuffer() throws Exception
         {
         final String threeMessages = 
             this.m_fullMessageString + this.m_fullMessageString + 
@@ -139,6 +153,96 @@ public class SipMessageBufferReaderImplTest extends TestCase
             reader.readMessages(ByteBuffer.allocate(0), buf);
         assertEquals(0, returned.remaining());
         assertEquals(3, this.m_numInvitesReceived);
+        }
+    
+    /**
+     * Tests the bizarre case we've seen often in the field where the word 
+     * "INVITE" is mysteriously missing from the beginning of an invite message.
+     * 
+     * @throws Exception If any unexpected error occurs.
+     */
+    public void testMissingInvite() throws Exception
+        {
+        LOG.debug("Testing missing INVITE");
+        
+        final String missingInviteWordInvite = 
+            StringUtils.substringAfter(this.m_fullMessageString, "INVITE");
+        
+        final String messages = 
+            this.m_fullMessageString + missingInviteWordInvite + 
+            this.m_fullMessageString;
+        
+        this.m_numInvitesReceived = 0;
+        
+        final byte[] messagesBytes = messages.getBytes("US-ASCII");
+        final ByteBuffer buf = ByteBuffer.wrap(messagesBytes);
+        buf.rewind();
+        final SipHeaderFactory headerFactory = new SipHeaderFactoryImpl();
+        final SipMessageFactory messageFactory = 
+            new SipMessageFactoryImpl(headerFactory);
+        final SipMessageBufferReader reader = 
+            new SipMessageBufferReaderImpl(messageFactory, this);
+        final ByteBuffer returned = 
+            reader.readMessages(ByteBuffer.allocate(0), buf);
+        //assertEquals(0, returned.remaining());
+        //assertEquals(3, this.m_numInvitesReceived);
+        }
+    
+    /**
+     * Tests the case where a buffer contains several complete messages.
+     * 
+     * @throws Exception If any unexpected error occurs.
+     */
+    public void testCrlfKeepAlive() throws Exception
+        {
+        String messages = 
+            this.m_fullMessageString + "\r\n\r\n" + 
+            this.m_fullMessageString;
+        
+        byte[] messagesBytes = messages.getBytes("US-ASCII");
+        ByteBuffer buf = ByteBuffer.wrap(messagesBytes);
+        buf.rewind();
+        final SipHeaderFactory headerFactory = new SipHeaderFactoryImpl();
+        final SipMessageFactory messageFactory = 
+            new SipMessageFactoryImpl(headerFactory);
+        final SipMessageBufferReader reader = 
+            new SipMessageBufferReaderImpl(messageFactory, this);
+        ByteBuffer returned = 
+            reader.readMessages(ByteBuffer.allocate(0), buf);
+        assertEquals(0, returned.remaining());
+        assertEquals(1, this.m_numDoubleCrlfsReceived);
+        assertEquals(2, this.m_numInvitesReceived);
+        
+        // Now try with a double CRLF at the end.
+        this.m_numInvitesReceived = 0;
+        this.m_numDoubleCrlfsReceived = 0;
+        messages = 
+            this.m_fullMessageString + "\r\n\r\n" + 
+            this.m_fullMessageString + "\r\n\r\n";
+        messagesBytes = messages.getBytes("US-ASCII");
+        buf = ByteBuffer.wrap(messagesBytes);
+        buf.rewind();
+        
+        returned = reader.readMessages(ByteBuffer.allocate(0), buf);
+        assertEquals(0, returned.remaining());
+        assertEquals(2, this.m_numDoubleCrlfsReceived);
+        assertEquals(2, this.m_numInvitesReceived);
+        
+        
+        // Now try with multiple double CRLFs in a row.
+        this.m_numInvitesReceived = 0;
+        this.m_numDoubleCrlfsReceived = 0;
+        messages = 
+            "\r\n\r\n" + "\r\n\r\n" + "\r\n\r\n" + this.m_fullMessageString + 
+            "\r\n\r\n" + this.m_fullMessageString + "\r\n\r\n";
+        messagesBytes = messages.getBytes("US-ASCII");
+        buf = ByteBuffer.wrap(messagesBytes);
+        buf.rewind();
+        
+        returned = reader.readMessages(ByteBuffer.allocate(0), buf);
+        assertEquals(0, returned.remaining());
+        assertEquals(5, this.m_numDoubleCrlfsReceived);
+        assertEquals(2, this.m_numInvitesReceived);
         }
 
     public void visitOk(OkResponse response)
@@ -168,5 +272,10 @@ public class SipMessageBufferReaderImplTest extends TestCase
         {
         // TODO Auto-generated method stub
         
+        }
+
+    public void visitDoubleCrlfKeepAlive(DoubleCrlfKeepAlive keepAlive)
+        {
+        this.m_numDoubleCrlfsReceived++;
         }
     }

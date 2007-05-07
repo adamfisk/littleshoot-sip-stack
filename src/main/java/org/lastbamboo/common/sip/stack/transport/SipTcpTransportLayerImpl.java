@@ -184,7 +184,12 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
         if (LOG.isDebugEnabled())
             {
             final String bufString = ByteBufferUtils.toString(buf);
-            Assert.isTrue(bufString.equals(message.toString()));
+            final String messageString = message.toString();
+            if (!bufString.equals(messageString))
+                {
+                LOG.warn(bufString + " not equal to " + messageString);
+                }
+            Assert.isTrue(bufString.equals(messageString));
             }
         readerWriter.writeLater(buf, this);
         }
