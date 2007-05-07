@@ -31,7 +31,7 @@ public class SipMessageBufferReaderImplTest extends TestCase
         "INVITE sip:1@lastbamboo.org SIP/2.0\r\n" +
         "To: Anonymous <sip:1@lastbamboo.org>\r\n" +
         "Via: SIP/2.0/TCP 10.250.74.236;branch=z9hG4bK0363854\r\n" +
-        "Content-Length: 158\r\n" +
+        "Content-Length: 160\r\n" +
         "CSeq: 9 INVITE\r\n" +
         "Contact: <sip:3@127.0.0.1>;+sip.instance=\"<urn:uuid:2d76276d-9b37-44b8-9658-7dadd4e5cbad>\"\r\n" +
         "From: Bob <sip:3@lastbamboo.org>;tag=63366469-4\r\n" +
@@ -45,7 +45,7 @@ public class SipMessageBufferReaderImplTest extends TestCase
         "t=0 0\r\n" +
         "c=IN IP4 pc33.atlanta.com\r\n" +
         "m=audio 3456 RTP/AVP 0 1 3 99\r\n" +
-        "a=rtpmap:0 PCMU/8000";
+        "a=rtpmap:0 PCMU/8000\r\n";
     private int m_numInvitesReceived;
     
     /**
@@ -60,7 +60,7 @@ public class SipMessageBufferReaderImplTest extends TestCase
             "INVITE sip:2@lastbamboo.org SIP/2.0\r\n" +
             "To: Anonymous <sip:1@lastbamboo.org>\r\n" +
             "Via: SIP/2.0/TCP 10.250.74.236;branch=z9hG4bK0363854\r\n" +
-            "Content-Length: 158\r\n" +
+            "Content-Length: 160\r\n" +
             "CSeq: 9 INVITE\r\n" +
             "Contact: <sip:3@127.0.0.1>;+sip.instance=\"<urn:uuid:2d76276d-9b37-44b8-9658-7dadd4e5cbad>\"\r\n" +
             "From: Bob <sip:3@lastbamboo.org>;tag=63366469-4\r\n";
@@ -76,7 +76,7 @@ public class SipMessageBufferReaderImplTest extends TestCase
             "t=0 0\r\n" +
             "c=IN IP4 pc33.atlanta.com\r\n" +
             "m=audio 3456 RTP/AVP 0 1 3 99\r\n" +
-            "a=rtpmap:0 PCMU/8000";
+            "a=rtpmap:0 PCMU/8000\r\n";
         
         final String fullBufferString = m_fullMessageString + partialMessage;
         final byte[] fullBufferBytes = fullBufferString.getBytes("US-ASCII");

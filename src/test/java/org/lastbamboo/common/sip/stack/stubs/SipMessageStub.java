@@ -55,7 +55,7 @@ public class SipMessageStub implements SipMessage
         return null;
         }
 
-    public int getLength()
+    public int getTotalLength()
         {
         // TODO Auto-generated method stub
         return 0;

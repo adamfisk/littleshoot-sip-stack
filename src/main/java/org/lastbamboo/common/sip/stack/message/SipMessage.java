@@ -63,11 +63,12 @@ public interface SipMessage
     byte[] getBody();
 
     /**
-     * Accessor for the length of the message.
+     * Accessor for the total length of the message including both the headers
+     * and the message body.
      * 
      * @return The length of the message.
      */
-    int getLength();
+    int getTotalLength();
     
     /**
      * Accepts the specified message visitor.

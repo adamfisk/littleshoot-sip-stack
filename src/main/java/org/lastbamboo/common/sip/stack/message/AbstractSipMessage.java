@@ -203,7 +203,7 @@ public abstract class AbstractSipMessage implements SipMessage
         return this.m_messageBody;
         }
     
-    public int getLength() 
+    public int getTotalLength() 
         {
         return getBytes().length;
         }
