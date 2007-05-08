@@ -417,6 +417,10 @@ public class SipMessageFactoryImpl implements SipMessageFactory
         // alive message.
         if (messageString.startsWith("\r\n\r\n"))
             {
+            if (LOG.isDebugEnabled())
+                {
+                LOG.debug("Got double CRLF keep alive");
+                }
             return new DoubleCrlfKeepAlive();
             }
         final BufferedReader reader = 
