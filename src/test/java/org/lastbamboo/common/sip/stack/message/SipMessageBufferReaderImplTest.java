@@ -184,8 +184,8 @@ public class SipMessageBufferReaderImplTest extends TestCase
             new SipMessageBufferReaderImpl(messageFactory, this);
         final ByteBuffer returned = 
             reader.readMessages(ByteBuffer.allocate(0), buf);
-        //assertEquals(0, returned.remaining());
-        //assertEquals(3, this.m_numInvitesReceived);
+        assertEquals(0, returned.remaining());
+        assertEquals(3, this.m_numInvitesReceived);
         }
     
     /**

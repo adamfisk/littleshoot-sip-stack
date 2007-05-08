@@ -88,8 +88,7 @@ public class SipMessageBufferReaderImpl implements SipMessageBufferReader
             LOG.debug("New string: "+newChars.toString());
             }
         int beginIndex = 0;
-        
-        // Loop until we get the closing CRLF.
+
         while (true && !(StringUtils.isEmpty(messageString)))
             {
             final long startTime = System.currentTimeMillis();

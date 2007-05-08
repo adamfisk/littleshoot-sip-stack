@@ -118,7 +118,8 @@ public class SipMessageFactoryImpl implements SipMessageFactory
         final Matcher matcher = METHOD_WHITESPACE.matcher(requestLine);
         if (!matcher.find())
             {
-            throw new IOException("Invalid SIP request line: '"+requestLine+"'");
+            LOG.warn("Could not find method for request line: "+requestLine);
+            throw new IOException("Invalid SIP request line:'"+requestLine+"'");
             }
         
         final String method = matcher.group(1);
@@ -134,6 +135,17 @@ public class SipMessageFactoryImpl implements SipMessageFactory
         if (!this.m_requestFactories.containsKey(method.toLowerCase()))
             {
             LOG.warn("Did not recognize method: "+method);
+            // Handle the case where the first INVITE indicating the message
+            // type mysteriously doesn't come through.  Just add the INVITE to
+            // beginning as if it were there all along.
+            // TODO: Obviously ugly and horrible.  We need to figure out why
+            // this could ever happen and fix the problem.
+            final String trimmedRequestLine = requestLine.trim(); 
+            if (trimmedRequestLine.startsWith("sip:"))
+                {
+                LOG.debug("Treating as an INVITE");
+                return toRequestFactory("INVITE "+trimmedRequestLine);
+                }
             return this.m_unknownRequestFactory;
             }
    
@@ -400,6 +412,9 @@ public class SipMessageFactoryImpl implements SipMessageFactory
     public SipMessage createSipMessage(final String messageString) 
         throws IOException  
         {
+        // Check for the double CRLF keep alive outside of the normal message
+        // reading since the BufferedReader readLine method eats the keep
+        // alive message.
         if (messageString.startsWith("\r\n\r\n"))
             {
             return new DoubleCrlfKeepAlive();
@@ -435,6 +450,8 @@ public class SipMessageFactoryImpl implements SipMessageFactory
         
         // The 2 extra bytes are for the "\r\n".
         bytesRead += curLine.length() + 2;
+        
+        // Now read all the headers.  The headers are terminated with a CRLF.
         while (!StringUtils.isBlank(curLine))
             {
             LOG.debug(curLine);
