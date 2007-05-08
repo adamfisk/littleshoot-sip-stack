@@ -139,7 +139,8 @@ public class SipMessageBufferReaderImpl implements SipMessageBufferReader
                 
                 if (totalTime > 2 * 1000)
                     {
-                    LOG.warn("Took "+totalTime+" ms to process message...");
+                    LOG.warn("Took "+totalTime+" ms to process message: " + 
+                        message);
                     }
                 if (LOG.isDebugEnabled())
                     {
