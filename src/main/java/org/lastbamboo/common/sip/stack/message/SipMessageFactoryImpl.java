@@ -250,7 +250,7 @@ public class SipMessageFactoryImpl implements SipMessageFactory
             }
         final Map headers = createResponseHeaders(request);
         addRecordRoute(request, headers);
-        addContact(request, headers, instanceId, contactUri);
+        addContact(headers, instanceId, contactUri);
         addContentLength(headers, body.length);
         
         final SipMessage msg = 
@@ -320,12 +320,11 @@ public class SipMessageFactoryImpl implements SipMessageFactory
      * Add a contact header.  For responses that establish dialogs, this is
      * specified in RFC 3261 section 12.1.1, page 70.
      * 
-     * @param request The request to copy the header from.
      * @param headers The headers to copy into.
      * @param instanceId The instance ID of the user.
      * @param contactUri The contact URI of the user.
      */
-    private void addContact(final Invite request, final Map headers, 
+    private void addContact(final Map headers, 
         final UUID instanceId, final URI contactUri)
         {
         final SipHeader contact = 

@@ -69,7 +69,8 @@ public class SipClientTransactionImpl implements SipClientTransaction
             {
             public void run()
                 {
-                LOG.warn("Timer B firing!!  The client transaction timed out.");
+                LOG.warn("Timer B firing!!  The client transaction timed out" +
+                    " for request: " + m_request);
                 m_timerBFired = true;
                 final SipMessage timeout = 
                     m_messageFactory.createRequestTimeoutResponse(m_request);
