@@ -1,9 +1,10 @@
 package org.lastbamboo.common.sip.stack.message;
 
-import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.mina.common.ByteBuffer;
+import org.lastbamboo.common.sip.stack.codec.SipMethod;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 
 /**
@@ -24,14 +25,14 @@ public interface SipMessage
      * 
      * @return The method of the message.
      */
-    String getMethod();
+    SipMethod getMethod();
     
     /**
      * Accessor for the complete message bytes.
      * 
      * @return The complete message bytes.
      */
-    byte[] getBytes();
+    //ByteBuffer getBytes();
 
     /**
      * Accessor for the complete header with the specified name.
@@ -47,20 +48,13 @@ public interface SipMessage
      * @return The list of routes for this message.
      */
     List getRouteSet();
-
-    /**
-     * Accessor for the entire message as a byte buffer.
-     * 
-     * @return The message as a byte buffer.
-     */
-    ByteBuffer toByteBuffer();
     
     /**
      * Accessor for the message body.
      * 
      * @return The message body.
      */
-    byte[] getBody();
+    ByteBuffer getBody();
 
     /**
      * Accessor for the total length of the message including both the headers
@@ -68,14 +62,14 @@ public interface SipMessage
      * 
      * @return The length of the message.
      */
-    int getTotalLength();
+    //int getTotalLength();
     
     /**
      * Accepts the specified message visitor.
      * 
      * @param visitor The visitor to accept.
      */
-    void accept(final SipMessageVisitor visitor);
+    void accept(SipMessageVisitor visitor);
 
     /**
      * Accessor the first line of the message.  For requests, this is the 
@@ -92,5 +86,5 @@ public interface SipMessage
      * 
      * @return All headers in the message.
      */
-    Map getHeaders();
+    Map<String, SipHeader> getHeaders();
     }

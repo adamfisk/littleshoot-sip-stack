@@ -1,16 +1,16 @@
 package org.lastbamboo.common.sip.stack.message;
 
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.id.uuid.UUID;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.lastbamboo.common.sip.stack.message.SipMessage;
-import org.lastbamboo.common.sip.stack.message.SipMessageFactory;
-import org.lastbamboo.common.sip.stack.message.SipMessageFactoryImpl;
+import org.apache.mina.common.ByteBuffer;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactoryImpl;
@@ -34,46 +34,32 @@ public class SipMessageFactoryImplTest extends TestCase
      */
     public void testStripVia() throws Exception 
         {
-        final String sdp = 
-            "v=0\r\n" +
-            "o=alice 53655765 2353687637 IN IP4 pc33.atlanta.com\r\n" +
-            "s=Session SDP\r\n" +
-            "t=0 0\r\n" +
-            "c=IN IP4 pc33.atlanta.com\r\n" +
-            "m=audio 3456 RTP/AVP 0 1 3 99\r\n" +
-            "a=rtpmap:0 PCMU/8000";
-        
-        final String messageString = 
-            "INVITE sip:bob@biloxi.com SIP/2.0\r\n" +
-            "Via: SIP/2.0/TCP 192.168.1.5;branch=z9hG4bKd79225d,SIP/2.0/TCP 192.168.1.5;received=127.0.0.1;branch=z9hG4bKf2b6a7e;rport=1348\r\n" +
-            "To: Bob <bob@biloxi.com>\r\n" +
-            "From: Alice <alice@atlanta.com>;tag=1928301774\r\n" +
-            "Call-ID: a84b4c76e66710\r\n" +
-            "CSeq: 314159 INVITE\r\n" +
-            "Max-Forwards: 70\r\n" +
-            "Date: Thu, 21 Feb 2002 13:02:03 GMT\r\n" +
-            "Contact: <sip:alice@pc33.atlanta.com>\r\n" +
-            "Content-Type: application/sdp\r\n" +
-            "Content-Length: " + sdp.length() + "\r\n" +
-            "\r\n" +
-            sdp;
-        
         final SipHeaderFactory headerFactory = new SipHeaderFactoryImpl();
         final SipMessageFactory messageFactory = 
             new SipMessageFactoryImpl(headerFactory);
-        final InetSocketAddress socketAddress = 
-            new InetSocketAddress("46.76.32.1", 3525);
+        final InetSocketAddress socketAddress1 = 
+            new InetSocketAddress("46.76.232.1", 5525);
+        //final InetSocketAddress socketAddress2 = 
+          //  new InetSocketAddress("46.76.32.1", 3525);
         
-        final SipMessage request = 
-            messageFactory.createSipMessage(messageString);
+        Invite request = createInvite();
+        //final SipHeader startVia = 
+          //  headerFactory.createSentByVia(socketAddress1.getAddress());
+        //request = messageFactory.addVia(request, startVia);
         
-        final SipMessage invite = 
-            messageFactory.createInviteToForward(socketAddress, request);
+        // Forward it so we have a via to strip.
+        final Invite invite = 
+            messageFactory.createInviteToForward(socketAddress1, request);
+        
         final SipHeader via = invite.getHeader(SipHeaderNames.VIA);
-        final List values = via.getValues();
+        final List<SipHeaderValue> values = via.getValues();
         assertEquals(2, values.size());
         
-        final SipMessage strippedViaMessage = messageFactory.stripVia(invite);
+        final SipResponse response = messageFactory.createInviteOk(
+            request, UUID.randomUUID(), new URI("bob@cookies.com"), 
+            request.getBody());
+        
+        final SipMessage strippedViaMessage = messageFactory.stripVia(response);
         final List strippedVias = 
             strippedViaMessage.getHeader(SipHeaderNames.VIA).getValues();
         assertEquals(1, strippedVias.size());
@@ -87,38 +73,13 @@ public class SipMessageFactoryImplTest extends TestCase
      */
     public void testModifyVia() throws Exception
         {
-        final String sdp = 
-            "v=0\r\n" +
-            "o=alice 53655765 2353687637 IN IP4 pc33.atlanta.com\r\n" +
-            "s=Session SDP\r\n" +
-            "t=0 0\r\n" +
-            "c=IN IP4 pc33.atlanta.com\r\n" +
-            "m=audio 3456 RTP/AVP 0 1 3 99\r\n" +
-            "a=rtpmap:0 PCMU/8000";
-        
-        final String messageString = 
-            "INVITE sip:bob@biloxi.com SIP/2.0\r\n" +
-            "Via: SIP/2.0/TCP 192.168.1.5;branch=z9hG4bKd79225d,SIP/2.0/TCP 192.168.1.5;received=127.0.0.1;branch=z9hG4bKf2b6a7e;rport=1348\r\n" +
-            "To: Bob <bob@biloxi.com>\r\n" +
-            "From: Alice <alice@atlanta.com>;tag=1928301774\r\n" +
-            "Call-ID: a84b4c76e66710\r\n" +
-            "CSeq: 314159 INVITE\r\n" +
-            "Max-Forwards: 70\r\n" +
-            "Date: Thu, 21 Feb 2002 13:02:03 GMT\r\n" +
-            "Contact: <sip:alice@pc33.atlanta.com>\r\n" +
-            "Content-Type: application/sdp\r\n" +
-            "Content-Length: " + sdp.length() + "\r\n" +
-            "\r\n" +
-            sdp;
-        
         final SipHeaderFactory headerFactory = new SipHeaderFactoryImpl();
         final SipMessageFactory messageFactory = 
             new SipMessageFactoryImpl(headerFactory);
         final InetSocketAddress socketAddress = 
             new InetSocketAddress("46.76.32.1", 3525);
         
-        final SipMessage request = 
-            messageFactory.createSipMessage(messageString);
+        final Invite request = createInvite();
         
         final SipMessage invite = 
             messageFactory.createInviteToForward(socketAddress, request);
@@ -136,7 +97,8 @@ public class SipMessageFactoryImplTest extends TestCase
         assertNotNull(address);
         assertEquals(socketAddress.getAddress().getHostAddress(), address);
         }
-    
+   
+
     /**
      * Tests the method for adding the Via header.
      * 
@@ -144,63 +106,37 @@ public class SipMessageFactoryImplTest extends TestCase
      */
     public void testAddVia() throws Exception 
         {
-        final String sdp = 
-            "v=0\r\n" +
-            "o=alice 53655765 2353687637 IN IP4 pc33.atlanta.com\r\n" +
-            "s=Session SDP\r\n" +
-            "t=0 0\r\n" +
-            "c=IN IP4 pc33.atlanta.com\r\n" +
-            "m=audio 3456 RTP/AVP 0 1 3 99\r\n" +
-            "a=rtpmap:0 PCMU/8000";
-        
-        final String messageString = 
-            "INVITE sip:bob@biloxi.com SIP/2.0\r\n" +
-            "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKnashds8\r\n" +
-            "To: Bob <bob@biloxi.com>\r\n" +
-            "From: Alice <alice@atlanta.com>;tag=1928301774\r\n" +
-            "Call-ID: a84b4c76e66710\r\n" +
-            "CSeq: 314159 INVITE\r\n" +
-            "Max-Forwards: 70\r\n" +
-            "Date: Thu, 21 Feb 2002 13:02:03 GMT\r\n" +
-            "Contact: <sip:alice@pc33.atlanta.com>\r\n" +
-            "Content-Type: application/sdp\r\n" +
-            "Content-Length: " + sdp.length() + "\r\n" +
-            "\r\n" +
-            sdp;
         final SipHeaderFactory headerFactory = new SipHeaderFactoryImpl();
         final SipMessageFactory messageFactory = 
             new SipMessageFactoryImpl(headerFactory);
         final InetSocketAddress socketAddress = 
             new InetSocketAddress("46.76.32.1", 3525);
         
-        final SipMessage request = 
-            messageFactory.createSipMessage(messageString);
+        final String viaValue = 
+            "SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKnashds8";
+        final Invite request = createInvite(viaValue);
         final SipHeader via = 
             headerFactory.createSentByVia(socketAddress.getAddress());
-        final SipMessage message = messageFactory.addVia(request, via);
+        final Invite message = messageFactory.addVia(request, via);
         final SipHeader via2 = message.getHeader(SipHeaderNames.VIA);
-        final List vias = via2.getValues();
+        final List<SipHeaderValue> vias = via2.getValues();
         assertEquals(2, vias.size());
         
         final SipHeaderValue topVia = via2.getValue();
         assertEquals(via.getValue(), topVia);
-        
-        final byte[] messageBytes = message.getBytes();
-        final SipMessage invite = 
-            messageFactory.createSipMessage(new String(messageBytes));
-        
-        final SipHeader fullCircleVia = invite.getHeader(SipHeaderNames.VIA);
-        assertEquals(vias, fullCircleVia.getValues());
+        }
+    
 
-        LOG.debug("Message: "+message);
+    private Invite createInvite() throws Exception
+        {
+        final String viaValue = "SIP/2.0/TCP 192.168.1.5;" +
+            "branch=z9hG4bKd79225d,SIP/2.0/TCP 192.168.1.5;" +
+            "received=127.0.0.1;branch=z9hG4bKf2b6a7e;rport=1348";
+            
+        return createInvite(viaValue);
         }
     
-    /**
-     * Test to make sure the factory can handle headers with multiple values.
-     * 
-     * @throws Exception If any unexpected error occurs.
-     */
-    public void testHeadersWithMultipleValues() throws Exception
+    private Invite createInvite(final String viaValue) throws Exception
         {
         final String sdp = 
             "v=0\r\n" +
@@ -210,90 +146,19 @@ public class SipMessageFactoryImplTest extends TestCase
             "c=IN IP4 pc33.atlanta.com\r\n" +
             "m=audio 3456 RTP/AVP 0 1 3 99\r\n" +
             "a=rtpmap:0 PCMU/8000";
-        
-        // Use multiple via headers.
-        final String message = 
-            "INVITE sip:bob@biloxi.com SIP/2.0\r\n" +
-            "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKnashds8," +
-            "pc44.atlanta.com;branch=z9hG4bKnasROs8\r\n" +
-            "To: Bob <bob@biloxi.com>\r\n" +
-            "From: Alice <alice@atlanta.com>;tag=1928301774\r\n" +
-            "Call-ID: a84b4c76e66710\r\n" +
-            "CSeq: 314159 INVITE\r\n" +
-            "Max-Forwards: 70\r\n" +
-            "Date: Thu, 21 Feb 2002 13:02:03 GMT\r\n" +
-            "Contact: <sip:alice@pc33.atlanta.com>\r\n" +
-            "Content-Type: application/sdp\r\n" +
-            "Content-Length: " + sdp.length() + "\r\n" +
-            "\r\n" +
-            sdp;
-        
         final SipHeaderFactory headerFactory = new SipHeaderFactoryImpl();
         final SipMessageFactory messageFactory = 
             new SipMessageFactoryImpl(headerFactory);
+        final UUID instanceId = UUID.randomUUID();
         
-        final SipMessage sipMessage = messageFactory.createSipMessage(message);
-        final SipHeader via = sipMessage.getHeader(SipHeaderNames.VIA);
-        final List vias = via.getValues();
-        assertEquals(2, vias.size());
-        }
-    
-    /**
-     * Tests the method for creating SIP messages from raw strings.
-     * 
-     * @throws Exception If any unexpected error occurs.
-     */
-    public void testCreateMessageFromRawString() throws Exception
-        {
-        final String sdp = 
-            "v=0\r\n" +
-            "o=alice 53655765 2353687637 IN IP4 pc33.atlanta.com\r\n" +
-            "s=Session SDP\r\n" +
-            "t=0 0\r\n" +
-            "c=IN IP4 pc33.atlanta.com\r\n" +
-            "m=audio 3456 RTP/AVP 0 1 3 99\r\n" +
-            "a=rtpmap:0 PCMU/8000";
-        final String message = 
-            "INVITE sip:bob@biloxi.com SIP/2.0\r\n" +
-            "Via: SIP/2.0/UDP pc33.atlanta.com;branch=z9hG4bKnashds8\r\n" +
-            "To: Bob <bob@biloxi.com>\r\n" +
-            "From: Alice <alice@atlanta.com>;tag=1928301774\r\n" +
-            "Call-ID: a84b4c76e66710\r\n" +
-            "CSeq: 314159 INVITE\r\n" +
-            "Max-Forwards: 70\r\n" +
-            "Date: Thu, 21 Feb 2002 13:02:03 GMT\r\n" +
-            "Contact: <sip:alice@pc33.atlanta.com>\r\n" +
-            "Content-Type: application/sdp\r\n" +
-            "Content-Length: " + sdp.length() + "\r\n" +
-            "\r\n" +
-            sdp;
+        Invite request = messageFactory.createInviteRequest("Bob", 
+            new URI("sip:bob@biloxi.com"), new URI("alice@atlanta.com"), 
+            instanceId, new URI("sip:alice@pc33.atlanta.com"), 
+            ByteBuffer.wrap(sdp.getBytes("US-ASCII")));
         
-        final SipHeaderFactory headerFactory = new SipHeaderFactoryImpl();
-        final SipMessageFactory messageFactory = 
-            new SipMessageFactoryImpl(headerFactory);
-        
-        final SipMessage sipMessage = messageFactory.createSipMessage(message);
-        assertNotNull("Should have created message", sipMessage);
-        final SipHeader contentLength = 
-            sipMessage.getHeader(SipHeaderNames.CONTENT_LENGTH);
-        assertNotNull(contentLength);
-        assertEquals(sdp.length(), 
-            Integer.parseInt(contentLength.getValue().getBaseValue()));
-        
-        final String incompleteMessage = 
-            message.substring(0, message.length()-4);
-        
-        final SipMessage nullMessage = 
-            messageFactory.createSipMessage(incompleteMessage);
-        assertNull(nullMessage);
-        
-        final String completeMessage = incompleteMessage + "8000";
-        final SipMessage notNullMessage = 
-            messageFactory.createSipMessage(completeMessage);
-        assertNotNull(notNullMessage);
-        
-        final byte[] body = notNullMessage.getBody();
-        final String sdpFromMessage = new String(body);
-        assertEquals("SDP is not equal", sdp, sdpFromMessage);
+        final SipHeader via = headerFactory.createHeader("Via", viaValue);
+
+        request = messageFactory.addVia(request, via);
+        return request;
         }
     }

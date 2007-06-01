@@ -49,7 +49,7 @@ public interface SipHeader
      * @return The {@link Collection} of header field values.  Each entry in
      * the collection is a header value.
      */
-    List getValues();
+    List<SipHeaderValue> getValues();
 
     /**
      * Adds a parameter with the specified name and the specified value.

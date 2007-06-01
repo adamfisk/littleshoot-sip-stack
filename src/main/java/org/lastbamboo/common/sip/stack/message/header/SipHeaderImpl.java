@@ -15,7 +15,7 @@ public class SipHeaderImpl implements SipHeader
     private static final Log LOG = LogFactory.getLog(SipHeaderImpl.class);
     
     private final String m_headerName;
-    private final List m_headerValues;
+    private final List<SipHeaderValue> m_headerValues;
 
     /**
      * Creates a new SIP header with the specified name and values.
@@ -23,7 +23,8 @@ public class SipHeaderImpl implements SipHeader
      * @param headerName The name of the header.  
      * @param headerValues The values of the header.
      */
-    public SipHeaderImpl(final String headerName, final List headerValues)
+    public SipHeaderImpl(final String headerName, 
+        final List<SipHeaderValue> headerValues)
         {
         if (LOG.isDebugEnabled())
             {
@@ -44,10 +45,11 @@ public class SipHeaderImpl implements SipHeader
         {
         this(headerName, createValues(headerValue));
         }
-    
-    private static List createValues(final SipHeaderValue headerValue)
+
+    private static List<SipHeaderValue> createValues(
+        final SipHeaderValue headerValue)
         {
-        final List values = new ArrayList();
+        final List<SipHeaderValue> values = new ArrayList<SipHeaderValue>();
         values.add(headerValue);
         return values;
         }
@@ -57,17 +59,17 @@ public class SipHeaderImpl implements SipHeader
         return this.m_headerName;
         }
     
-    public List getValues()
+    public List<SipHeaderValue> getValues()
         {
         synchronized(this.m_headerValues)
             {
-            return new ArrayList(this.m_headerValues);
+            return new ArrayList<SipHeaderValue>(this.m_headerValues);
             }
         }
     
     public SipHeaderValue getValue()
         {
-        return (SipHeaderValue) this.m_headerValues.get(0);
+        return this.m_headerValues.get(0);
         }
     
     public void addValue(final SipHeaderValue headerValue)

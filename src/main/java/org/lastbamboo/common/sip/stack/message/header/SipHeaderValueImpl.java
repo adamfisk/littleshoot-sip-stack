@@ -14,7 +14,7 @@ import org.lastbamboo.common.sip.stack.message.SipMessageUtils;
 public class SipHeaderValueImpl implements SipHeaderValue
     {
 
-    private final Map m_params;
+    private final Map<String, String> m_params;
     private final String m_baseValue;
 
     /**
@@ -37,7 +37,8 @@ public class SipHeaderValueImpl implements SipHeaderValue
      * @param baseValue The base value of the header with no parameters.
      * @param params The header value parameters.
      */
-    public SipHeaderValueImpl(final String baseValue, final Map params)
+    public SipHeaderValueImpl(final String baseValue, 
+        final Map<String, String> params)
         {
         this.m_baseValue = baseValue;
         this.m_params = params;
@@ -52,12 +53,12 @@ public class SipHeaderValueImpl implements SipHeaderValue
         return valueString;
         }
     
-    public Map getParams()
+    public Map<String, String> getParams()
         {
         // We favor immutability here.
         synchronized (this.m_params)
             {
-            return new ConcurrentHashMap(this.m_params);
+            return new ConcurrentHashMap<String, String>(this.m_params);
             }
         }
 
@@ -73,7 +74,7 @@ public class SipHeaderValueImpl implements SipHeaderValue
 
     public String getParamValue(final String paramName)
         {
-        return (String) this.m_params.get(paramName);
+        return this.m_params.get(paramName);
         }
 
     public boolean equals(final Object obj)

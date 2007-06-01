@@ -1,21 +1,19 @@
 package org.lastbamboo.common.sip.stack.message;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
-import java.util.Collection;
+import java.net.URI;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.mina.common.ByteBuffer;
+import org.lastbamboo.common.sip.stack.codec.SipMessageType;
+import org.lastbamboo.common.sip.stack.codec.SipMethod;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderNames;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderValue;
-import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstracts out generalized functions common to all SIP messages.
@@ -23,19 +21,20 @@ import org.springframework.util.Assert;
 public abstract class AbstractSipMessage implements SipMessage
     {
 
-    private static final Log LOG = LogFactory.getLog(AbstractSipMessage.class);
+    private static final Logger LOG = 
+        LoggerFactory.getLogger(AbstractSipMessage.class);
     
-    private final Map m_headers;
+    private final Map<String, SipHeader> m_headers;
     
-    private final String m_method;
+    private final SipMethod m_method;
 
     private final String m_startLine;
 
-    private final byte[] m_messageBody;
+    private final ByteBuffer m_messageBody;
     
-    private static final byte[] EMPTY_BODY = new byte[0];
+    private static final ByteBuffer EMPTY_BODY = ByteBuffer.allocate(0);
     
-    private byte[] m_messageBytes;
+    //private final ByteBuffer m_messageBytes;
 
     /**
      * Creates a new SIP message with the specified first line of the message
@@ -45,10 +44,13 @@ public abstract class AbstractSipMessage implements SipMessage
      * @param startLine The first line of the message.
      * @param headers The message headers.
      */
-    public AbstractSipMessage(final String startLine, final Map headers)
+    /*
+    public AbstractSipMessage(final String startLine, 
+        final Map<String, SipHeader> headers)
         {
         this(startLine, headers, EMPTY_BODY);
         }
+        */
     
     /**
      * Creates a new SIP message with the specified first line of the message,
@@ -58,176 +60,130 @@ public abstract class AbstractSipMessage implements SipMessage
      * @param headers The message headers.
      * @param body The message body.
      */
-    public AbstractSipMessage(final String startLine, final Map headers, 
-        final byte[] body)
+    public AbstractSipMessage(final String startLine, final SipMethod method,
+        final Map<String, SipHeader> headers, final ByteBuffer body)
         {
         this.m_startLine = startLine;
         this.m_headers = headers;
-        final SipHeader cseq = 
-            (SipHeader) headers.get(SipHeaderNames.CSEQ);
-        this.m_method = SipMessageUtils.extractCSeqMethod(cseq);
-        this.m_messageBody = body;
-        this.m_messageBytes = createBytes(startLine, headers, body);
-        
-        // Make sure the content length is correct.
-        checkContentLength(headers, body);
+        this.m_method = method;
+        this.m_messageBody = body.asReadOnlyBuffer();        
+        }
+
+    public AbstractSipMessage(final SipMethod method, final URI requestUri, 
+        final Map<String, SipHeader> headers)
+        {
+        this(method, requestUri, headers, EMPTY_BODY);
+        }
+
+    public AbstractSipMessage(final SipMethod method, final URI requestUri, 
+        final Map<String, SipHeader> headers, final ByteBuffer body)
+        {
+        this(createRequestLine(method, requestUri), method, headers, body);
+        }
+
+    public AbstractSipMessage(final int statusCode, final String reasonPhrase, 
+        final Map<String, SipHeader> headers, final ByteBuffer body)
+        {
+        this(createResponseStatusLine(statusCode, reasonPhrase), 
+            createMethod(headers), headers, body);
         }
     
-    private void checkContentLength(final Map headers, final byte[] body)
+    public AbstractSipMessage(final int statusCode, final String reasonPhrase, 
+        final Map<String, SipHeader> headers)
         {
-        final SipHeader contentLength = 
-            (SipHeader) headers.get(SipHeaderNames.CONTENT_LENGTH);
-        
-        if (contentLength == null)
-            {
-            if (body.length != 0)
-                {
-                LOG.error("Should be an empty body!!");
-                }
-            return;
-            }
-        final int length = 
-            Integer.parseInt(contentLength.getValue().getBaseValue());
-        if (length != body.length)
-            {
-            LOG.error("Unexpected content length: expected: "+length+
-                " but was: "+body.length);
-            }
-        Assert.isTrue(length == body.length, 
-            "Unexpected content length: expected: "+length+" but was: "+
-            body.length);
+        this(createResponseStatusLine(statusCode, reasonPhrase), 
+            createMethod(headers), headers, EMPTY_BODY);
         }
+
+    private static SipMethod createMethod(final Map<String, SipHeader> headers)
+        {
+        final SipHeader cseq = headers.get(SipHeaderNames.CSEQ);
+        final String methodString = SipMessageUtils.extractCSeqMethod(cseq);
+        return SipMethod.valueOf(methodString);
+        }
+
+    private static String createResponseStatusLine(final int statusCode, 
+        final String reasonPhrase)
+        {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(SipMessageType.SIP_2_0.convert());
+        sb.append(" ");
+        sb.append(statusCode);
+        sb.append(" ");
+        sb.append(reasonPhrase);
+        if (LOG.isDebugEnabled())
+            {
+            LOG.debug("Returning response line: "+sb.toString());
+            }
+        return sb.toString();
+        }
+
+    private static String createRequestLine(final SipMethod method, 
+        final URI requestUri)
+        {
+        return createRequestLine(method.name(), requestUri);
+        }
+    
+    protected static String createRequestLine(final String method, 
+        final URI requestUri)
+        {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(method);
+        sb.append(" ");
+        sb.append(requestUri);
+        sb.append(" ");
+        sb.append(SipMessageType.SIP_2_0.convert());
+        return sb.toString();
+        }
+    
 
     public SipHeader getHeader(final String headerName) 
         {
-        return (SipHeader) this.m_headers.get(headerName);
+        return this.m_headers.get(headerName);
         }
     
-    public Map getHeaders()
+    public Map<String, SipHeader> getHeaders()
         {
         // Return a copy of the headers to preserve the immutability of this
         // class.  This will only really get called when we're making a copy
         // of a message any way, so we might as well just make a copy.
         synchronized (this.m_headers)
             {
-            return new ConcurrentHashMap(this.m_headers);
+            return new ConcurrentHashMap<String, SipHeader>(this.m_headers);
             }
         }
     
-    public final byte[] getBytes()
-        {
-        return this.m_messageBytes;
-        }
-    
-    private static final byte[] createBytes(final String firstLine, 
-        final Map headers, final byte[] body)
-        {
-        final StringBuffer sb = new StringBuffer();
-        sb.append(firstLine);
-        sb.append("\r\n");
-        sb.append(getHeaderString(headers.values()));
-        sb.append("\r\n");
-        final String headerString = sb.toString();
-        try
-            {
-            final byte[] headerBytes = headerString.getBytes("US-ASCII");
-            if (ArrayUtils.isEmpty(body))
-                {
-                if (LOG.isDebugEnabled())
-                    {
-                    LOG.debug("Returning only headers...");
-                    }
-                return headerBytes;
-                }
-            final byte[] messageBytes = 
-                ArrayUtils.addAll(headerBytes, body);
-            return messageBytes;
-            }
-        catch (final UnsupportedEncodingException e)
-            {
-            LOG.error("Encoding error!!", e);
-            throw new IllegalStateException("Bad encoding??");
-            }
-        }
-    
-    private static String getHeaderString(final Collection headers)
-        {
-        final StringBuffer sb = new StringBuffer();
-        for (final Iterator iter = headers.iterator(); iter.hasNext();)
-            {
-            final SipHeader curHeader = (SipHeader) iter.next();
-            sb.append(curHeader.getName());
-            sb.append(": ");
-            appendHeaderValues(sb, curHeader.getValues());
-            sb.append("\r\n");
-            }
-        return sb.toString();
-        }
-    
-    private static void appendHeaderValues(final StringBuffer sb, 
-        final List values)
-        {
-        for (final Iterator iter = values.iterator(); iter.hasNext();)
-            {
-            final SipHeaderValue value = (SipHeaderValue) iter.next();
-            sb.append(value.getBaseValue());
-            final Map params = value.getParams();
-            for (final Iterator iterator = params.entrySet().iterator(); 
-                iterator.hasNext();)
-                {
-                sb.append(";");
-                final Map.Entry param = (Map.Entry) iterator.next();
-                sb.append(param.getKey());
-                sb.append("=");
-                sb.append(param.getValue());
-                }
-            if (iter.hasNext())
-                {
-                sb.append(",");
-                }
-            }
-        }
-
-    public ByteBuffer toByteBuffer()
-        {
-        final byte[] bytes = getBytes();
-        if (LOG.isDebugEnabled())
-            {
-            LOG.debug("Returning bytes with length: "+bytes.length);
-            }
-        return ByteBuffer.wrap(bytes);
-        }
-    
-    public byte[] getBody()
+    public ByteBuffer getBody()
         {
         return this.m_messageBody;
         }
     
+    /*
     public int getTotalLength() 
         {
-        return getBytes().length;
+        return getBytes().capacity();
         }
+        */
     
     public final String getBranchId()
         {
-        final SipHeader via = 
-            (SipHeader) this.m_headers.get(SipHeaderNames.VIA);
+        final SipHeader via = this.m_headers.get(SipHeaderNames.VIA);
         return via.getValue().getParamValue("branch");
         }
 
-    public final String getMethod()
+    public final SipMethod getMethod()
         {
         return this.m_method;
         }
 
-    public List getRouteSet()
+    public List<SipHeaderValue> getRouteSet()
         {
         final SipHeader recordRoute = 
-            (SipHeader) this.m_headers.get(SipHeaderNames.RECORD_ROUTE);
+            this.m_headers.get(SipHeaderNames.RECORD_ROUTE);
         
         if (recordRoute == null)
             {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
             }
         return recordRoute.getValues();
         }
@@ -235,11 +191,6 @@ public abstract class AbstractSipMessage implements SipMessage
     public String getStartLine() 
         {
         return this.m_startLine;
-        }
-    
-    public String toString()
-        {
-        return new String(getBytes());
         }
 
     }

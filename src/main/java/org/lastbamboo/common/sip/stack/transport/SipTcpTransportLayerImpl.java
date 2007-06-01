@@ -5,7 +5,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -14,38 +13,39 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.lastbamboo.common.protocol.CloseListener;
-import org.lastbamboo.common.protocol.ReaderWriter;
-import org.lastbamboo.common.protocol.ReaderWriterUtils;
-import org.lastbamboo.common.protocol.WriteData;
-import org.lastbamboo.common.protocol.WriteListener;
+import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoFuture;
+import org.apache.mina.common.IoFutureListener;
+import org.apache.mina.common.IoSession;
+import org.apache.mina.common.WriteFuture;
+import org.lastbamboo.common.sip.stack.message.Invite;
+import org.lastbamboo.common.sip.stack.message.Register;
 import org.lastbamboo.common.sip.stack.message.SipMessage;
 import org.lastbamboo.common.sip.stack.message.SipMessageFactory;
 import org.lastbamboo.common.sip.stack.message.SipMessageUtils;
+import org.lastbamboo.common.sip.stack.message.SipResponse;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
 import org.lastbamboo.common.sip.stack.transaction.SipClientTransaction;
 import org.lastbamboo.common.sip.stack.transaction.SipTransactionFactory;
 import org.lastbamboo.common.sip.stack.transaction.SipTransactionListener;
-import org.lastbamboo.common.util.ByteBufferUtils;
 import org.lastbamboo.common.util.NetworkUtils;
-import org.springframework.util.Assert;
 
 /**
  * The transport layer implementation for TCP.
  */
-public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
-    CloseListener, WriteListener
+public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer, 
+    IoFutureListener
     {
 
     private static final Log LOG = 
         LogFactory.getLog(SipTcpTransportLayerImpl.class);
     
     /**
-     * Map of InetSocketAddresses to ReaderWriters.
+     * Map of InetSocketAddresses to IoSessions.
      */
-    private final Map m_socketAddressesToReaderWriters = 
-        new ConcurrentHashMap();
+    private final Map<InetSocketAddress, IoSession> m_socketAddressesToIo = 
+        new ConcurrentHashMap<InetSocketAddress, IoSession>();
     private final SipHeaderFactory m_headerFactory;
     private final SipTransactionFactory m_transactionFactory;
     private final SipMessageFactory m_messageFactory;
@@ -68,22 +68,36 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
         this.m_messageFactory = messageFactory;
         }
     
-    public void addConnection(final ReaderWriter readerWriter)
+    public void addConnection(final IoSession io)
         {
         final InetSocketAddress remoteAddress = 
-            readerWriter.getRemoteSocketAddress();
-        LOG.debug("Adding connection for socket address: "+remoteAddress);
-        readerWriter.addCloseListener(this);
-        this.m_socketAddressesToReaderWriters.put(remoteAddress, readerWriter);
+            (InetSocketAddress) io.getRemoteAddress();
+        
+        if (LOG.isDebugEnabled())
+            {
+            LOG.debug("Adding connection for socket address: "+remoteAddress);
+            }
+        this.m_socketAddressesToIo.put(remoteAddress, io);
         }
     
-    public SipClientTransaction writeRequest(final SipMessage request, 
-        final ReaderWriter readerWriter, 
-        final SipTransactionListener transactionListener)
+    public void removeConnection(final IoSession io)
+        {
+        final InetSocketAddress remoteAddress = 
+            (InetSocketAddress) io.getRemoteAddress();
+        
+        if (LOG.isDebugEnabled())
+            {
+            LOG.debug("Removing connection for socket address: "+remoteAddress);
+            }
+        this.m_socketAddressesToIo.remove(remoteAddress);
+        }
+    
+    public SipClientTransaction writeRequest(final Invite request, 
+        final IoSession io, final SipTransactionListener transactionListener)
         {
         if (LOG.isDebugEnabled())
             {
-            LOG.debug("Writing request to: "+readerWriter);
+            LOG.debug("Writing request to: "+io);
             }
         final SipMessage viaAdded;
         try
@@ -102,12 +116,40 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
             this.m_transactionFactory.createClientTransaction(viaAdded, 
                 transactionListener);
         
-        write(viaAdded, readerWriter);
+        write(viaAdded, io, true);
+        return clientTransaction;
+        }
+    
+    public SipClientTransaction register(final Register request, 
+        final IoSession io, final SipTransactionListener transactionListener)
+        {
+        if (LOG.isDebugEnabled())
+            {
+            LOG.debug("Writing request to: "+io);
+            }
+        final SipMessage viaAdded;
+        try
+            {
+            viaAdded = addVia(request);
+            }
+        catch (final UnknownHostException e)
+            {
+            LOG.error("Could not get local host", e);
+            return null;
+            }
+        // We need to create the transaction after adding the Via header
+        // because the branch ID in the Via is used in the key for the
+        // transaction.
+        final SipClientTransaction clientTransaction = 
+            this.m_transactionFactory.createClientTransaction(viaAdded, 
+                transactionListener);
+        
+        write(viaAdded, io, true);
         return clientTransaction;
         }
 
-    public void writeRequestStatelessly(final SipMessage request, 
-        final ReaderWriter readerWriter)
+    public void writeRequestStatelessly(final Invite request, 
+        final IoSession io)
         {
         if (LOG.isDebugEnabled())
             {
@@ -116,16 +158,23 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
         try
             {
             final SipMessage viaAdded = addVia(request);
-            write(viaAdded, readerWriter);
+            write(viaAdded, io);
             }
         catch (final UnknownHostException e)
             {
             LOG.error("Could not get local host", e);
             }  
         }
+    
+    private Register addVia(final Register request) throws UnknownHostException
+        {
+        final InetAddress localHost = NetworkUtils.getLocalHost();
+        final SipHeader via = this.m_headerFactory.createSentByVia(localHost);
+        
+        return this.m_messageFactory.addVia(request, via);
+        }
 
-    private SipMessage addVia(final SipMessage request) 
-        throws UnknownHostException
+    private Invite addVia(final Invite request) throws UnknownHostException
         {
         final InetAddress localHost = NetworkUtils.getLocalHost();
         final SipHeader via = this.m_headerFactory.createSentByVia(localHost);
@@ -134,25 +183,23 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
         }
 
     public boolean writeResponse(final InetSocketAddress socketAddress, 
-        final SipMessage response)
+        final SipResponse response)
         {
-        final ReaderWriter connection = 
-            (ReaderWriter) this.m_socketAddressesToReaderWriters.get(
-                socketAddress);
+        final IoSession io = this.m_socketAddressesToIo.get(socketAddress);
         
-        if (connection == null)
+        if (io == null)
             {
             if (LOG.isWarnEnabled())
                 {
                 LOG.warn("No connection for socket address: "+socketAddress);
                 LOG.warn("hashCode(): "+socketAddress.hashCode());
-                if (this.m_socketAddressesToReaderWriters.size() < 10)
+                if (this.m_socketAddressesToIo.size() < 10)
                     {
                     LOG.warn("Existing connections: "+
-                        this.m_socketAddressesToReaderWriters);
+                        this.m_socketAddressesToIo);
                     final StringBuffer sb = new StringBuffer();
                     final Collection keys = 
-                        this.m_socketAddressesToReaderWriters.keySet();
+                        this.m_socketAddressesToIo.keySet();
                     for (final Iterator iter = keys.iterator(); iter.hasNext();)
                         {
                         final InetSocketAddress sa = 
@@ -168,22 +215,23 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
             return false;
             }
         
-        write(response, connection);
+        write(response, io);
         return true;
         }
     
-    private void write(final SipMessage message, 
-        final ReaderWriter readerWriter)
+    private void write(final SipMessage message, final IoSession io)
         {
         if (LOG.isDebugEnabled())
             {
             LOG.debug("Writing message: "+message);
             }
-        final ByteBuffer buf = message.toByteBuffer();
+        /*
+        final ByteBuffer buf = message.getBytes();
         
         if (LOG.isDebugEnabled())
             {
-            final String bufString = ByteBufferUtils.toString(buf);
+            
+            final String bufString = buf.toString();
             final String messageString = message.toString();
             if (!bufString.equals(messageString))
                 {
@@ -191,10 +239,37 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
                 }
             Assert.isTrue(bufString.equals(messageString));
             }
-        readerWriter.writeLater(buf, this);
+        
+        
+        if(LOG.isDebugEnabled())
+            {
+            try
+                {
+                final String messageString = buf.getString(asciiDecoder);
+                LOG.debug("Writing message: "+ messageString);
+                buf.flip();
+                }
+            catch (final CharacterCodingException e)
+                {
+                LOG.error("Bad char encoding", e);
+                }
+            }
+        */
+        
+        write(message, io, false);
+        
         }
     
-    public void writeCrlfKeepAlive(final ReaderWriter readerWriter)
+    private void write(SipMessage message, IoSession io, boolean listen)
+        {
+        final WriteFuture wf = io.write(message);
+        if (listen)
+            {
+            wf.addListener(this);
+            }
+        }
+    
+    public void writeCrlfKeepAlive(final IoSession io)
         {
         if (LOG.isDebugEnabled())
             {
@@ -212,48 +287,36 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
             return;
             }
 
-        readerWriter.writeLater(buf, this);
+        io.write(buf);
         }
 
-    public void onClose(final ReaderWriter readerWriter)
-        {
-        ReaderWriterUtils.removeFromMapValues(
-            this.m_socketAddressesToReaderWriters, readerWriter);
-        }
-
-    public void onWrite(final WriteData data)
-        {
-        if (LOG.isDebugEnabled())
-            {
-            LOG.debug("Wrote data: "+data);
-            }
-        }
-
-    public void writeResponse(final SipMessage response) throws IOException
+    public void writeResponse(final SipResponse response) throws IOException
         {
         final InetSocketAddress nextHop = 
             SipMessageUtils.extractNextHopFromVia(response);
         writeResponse(nextHop, response);
         }
 
-    public boolean hasConnectionForAny(final Collection socketAddresses)
+    public boolean hasConnectionForAny(
+        final Collection<InetSocketAddress> socketAddresses)
         {
-        synchronized (this.m_socketAddressesToReaderWriters)
+        synchronized (this.m_socketAddressesToIo)
             {
-            final Collection existingAddresses = 
-                this.m_socketAddressesToReaderWriters.keySet();
+            final Collection<InetSocketAddress> existingAddresses = 
+                this.m_socketAddressesToIo.keySet();
             return CollectionUtils.containsAny(existingAddresses, 
                 socketAddresses);
             }
         }
 
-    public void writeRequest(final Collection socketAddresses, 
-        final SipMessage request)
+    public void writeRequest(
+        final Collection<InetSocketAddress> socketAddresses, 
+        final Invite request)
         {
-        synchronized (this.m_socketAddressesToReaderWriters)
+        synchronized (this.m_socketAddressesToIo)
             {
             final Collection existingAddresses = 
-                this.m_socketAddressesToReaderWriters.keySet();
+                this.m_socketAddressesToIo.keySet();
             final Collection intersection = 
                 CollectionUtils.intersection(existingAddresses, 
                     socketAddresses);
@@ -266,13 +329,29 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
                 {
                 final InetSocketAddress socketAddress = 
                     (InetSocketAddress) iter.next();
-                final ReaderWriter rw = 
-                    (ReaderWriter) this.m_socketAddressesToReaderWriters.get(
-                        socketAddress);
-                writeRequestStatelessly(request, rw);
-                LOG.debug("Sent request to: "+rw);
+                final IoSession io = 
+                    this.m_socketAddressesToIo.get(socketAddress);
+                writeRequestStatelessly(request, io);
+                
+                if (LOG.isDebugEnabled())
+                    {
+                    LOG.debug("Sent request to: "+io);
+                    }
                 return;
                 }
+            }
+        }
+
+    public void operationComplete(final IoFuture future)
+        {
+        if (LOG.isDebugEnabled())
+            {
+            LOG.debug("Wrote messages: "+ 
+                future.getSession().getWrittenMessages());
+            LOG.debug("Scheduled: " + 
+                future.getSession().getScheduledWriteRequests());
+            LOG.debug("Written: " + 
+                future.getSession().getWrittenWriteRequests());
             }
         }
     }

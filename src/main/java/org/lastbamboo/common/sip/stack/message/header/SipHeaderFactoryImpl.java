@@ -13,7 +13,7 @@ import org.apache.commons.id.uuid.UUID;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.lastbamboo.common.sip.stack.message.SipMessageUtils;
+import org.lastbamboo.common.util.RuntimeIoException;
 
 /**
  * Factory for creating SIP headers.
@@ -26,16 +26,19 @@ public class SipHeaderFactoryImpl implements SipHeaderFactory
     
     private static int sequenceNumber = 1;
     
-    public SipHeader createHeader(final String headerString) throws IOException
+    public SipHeader createHeader(final String name, final String value) 
         {
-        LOG.debug("Creating header from string: "+headerString);
-        final String headerName = 
-            SipMessageUtils.extractName(headerString);
-        final String headerValueWithParams = 
-            SipMessageUtils.extractValue(headerString);
-        
-        final List headerValues = createHeaderValues(headerValueWithParams);
-        return new SipHeaderImpl(headerName, headerValues);
+        final List<SipHeaderValue> headerValues;
+        try
+            {
+            headerValues = createHeaderValues(value);
+            }
+        catch (final IOException e)
+            {
+            LOG.error("Could not parse header");
+            throw new RuntimeIoException(e);
+            }
+        return new SipHeaderImpl(name, headerValues);
         }
 
     /**
@@ -45,11 +48,14 @@ public class SipHeaderFactoryImpl implements SipHeaderFactory
      * @return A list of header value instances.
      * @throws IOException If the header values don't match the expected 
      * syntax.
+     * 
+     * TODO: This should really be handled at the protocol reading level 
+     * rather than re-parsing read data here.
      */
-    private List createHeaderValues(final String headerValueString) 
-        throws IOException
+    private List<SipHeaderValue> createHeaderValues(
+        final String headerValueString) throws IOException
         {
-        final List valuesList = new ArrayList();
+        final List<SipHeaderValue> valuesList = new ArrayList<SipHeaderValue>();
         if (!StringUtils.contains(headerValueString, ","))
             {
             final SipHeaderValue value = 
@@ -73,8 +79,8 @@ public class SipHeaderFactoryImpl implements SipHeaderFactory
         {
         final String baseValue = 
             "SIP/2.0/TCP " + address.getHostAddress();
-        final Map params = createParams(SipHeaderParamNames.BRANCH, 
-            createBranchId());
+        final Map<String, String> params = 
+            createParams(SipHeaderParamNames.BRANCH, createBranchId());
         
         return new SipHeaderImpl(SipHeaderNames.VIA, 
             new SipHeaderValueImpl(baseValue, params));
@@ -107,7 +113,7 @@ public class SipHeaderFactoryImpl implements SipHeaderFactory
     public SipHeader createTo(final SipHeader originalTo)
         {
         final SipHeaderValue value = originalTo.getValue();
-        final Map params = value.getParams();
+        final Map<String, String> params = value.getParams();
         params.put(SipHeaderParamNames.TAG, createTagValue());
         final SipHeaderValue copy = 
             new SipHeaderValueImpl(value.getBaseValue(), params);
@@ -117,7 +123,7 @@ public class SipHeaderFactoryImpl implements SipHeaderFactory
     public SipHeader createFrom(final String displayName, final URI sipUri)
         {
         final String baseValue = displayName + " <"+sipUri+">";
-        final Map params = createParams(SipHeaderParamNames.TAG, 
+        final Map<String, String> params = createParams(SipHeaderParamNames.TAG, 
             createTagValue());
         final SipHeaderValue value = new SipHeaderValueImpl(baseValue, params);
         return new SipHeaderImpl(SipHeaderNames.FROM, value);
@@ -144,7 +150,7 @@ public class SipHeaderFactoryImpl implements SipHeaderFactory
         {
         final String baseValue = "<"+contactUri+">";
         final String sipInstanceValue = "\"<"+instanceId.toUrn()+">\"";
-        final Map params = 
+        final Map<String, String> params = 
             createParams(SipHeaderParamNames.SIP_INSTANCE, sipInstanceValue);
         final SipHeaderValue value = new SipHeaderValueImpl(baseValue, params);
         return new SipHeaderImpl(SipHeaderNames.CONTACT, value);
@@ -201,9 +207,10 @@ public class SipHeaderFactoryImpl implements SipHeaderFactory
      * @param value The value of the first parameter to add.
      * @return The map mapping parameter names to parameter values.
      */
-    private Map createParams(final String name, final String value)
+    private Map<String, String> createParams(final String name, 
+        final String value)
         {
-        final Map params = new HashMap();
+        final Map<String, String> params = new HashMap<String, String>();
         params.put(name, value);
         return params;
         }

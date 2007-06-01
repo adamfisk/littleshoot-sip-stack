@@ -1,22 +1,17 @@
 package org.lastbamboo.common.sip.stack.message;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.id.uuid.UUID;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.mina.common.ByteBuffer;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderImpl;
@@ -37,24 +32,10 @@ public class SipMessageFactoryImpl implements SipMessageFactory
      */
     private static final Log LOG = 
         LogFactory.getLog(SipMessageFactoryImpl.class);
-    
-    private static final Pattern RESPONSE_CODE = 
-        Pattern.compile("2.0\\s+(\\d+)");
-    
-    /**
-     * Pattern for a SIP request method followed by whitespace.
-     */
-    private static final Pattern METHOD_WHITESPACE = 
-        Pattern.compile("(\\w+)\\s+");
 
     private final SipHeaderFactory m_headerFactory;
     
-    private final Map m_requestFactories = createRequstFactories();
-
-    private final SingleSipMessageFactory m_unknownRequestFactory =
-        new UnknownRequestFactory();
-    
-    private static final byte[] EMPTY_BODY = new byte[0];
+    private static final ByteBuffer EMPTY_BODY = ByteBuffer.allocate(0);
     
     /**
      * Creates a new SIP message factory.
@@ -65,163 +46,36 @@ public class SipMessageFactoryImpl implements SipMessageFactory
         {
         this.m_headerFactory = headerFactory;
         }
-    
-    private Map createRequstFactories()
-        {
-        final Map factories = new ConcurrentHashMap();
-        factories.put("invite", new InviteFactory());
-        factories.put("register", new RegisterFactory());
-        return factories;
-        }
-    
-    private SipMessage createSipMessage(final String requestOrResponseLine, 
-        final Map headers, final byte[] body) throws IOException
-        {
-        if (requestOrResponseLine.startsWith("SIP/2.0"))
-            {
-            return createResponse(requestOrResponseLine, headers, body);
-            }
-        else 
-            {
-            return createRequest(requestOrResponseLine, headers, body);
-            }
-        }
 
-    private SipMessage createRequest(final String requestLine, 
-        final Map headers, final byte[] body) throws IOException
-        {
-        if (LOG.isDebugEnabled())
-            {
-            LOG.debug("Creating SIP request from network with "+
-                headers.size()+" headers...");
-            }
-        if (headers.size() < 4)
-            {
-            LOG.error("Bad headers in message: " + headers);
-            }
-        final SingleSipMessageFactory factory = toRequestFactory(requestLine);
-        
-        LOG.debug("Creating request with factory: "+factory);
-        return factory.createSipMessage(requestLine, headers, body);
-        }
-    
-    /**
-     * Extracts the method of the request.
-     * @param requestLine The request line containing the request method as the
-     * first word.
-     * @return The request method for the request.
-     * @throws IOException If there's any error parsing the input.
-     */
-    public SingleSipMessageFactory toRequestFactory(final String requestLine) 
-        throws IOException
-        {
-        final Matcher matcher = METHOD_WHITESPACE.matcher(requestLine);
-        if (!matcher.find())
-            {
-            LOG.warn("Could not find method for request line: "+requestLine);
-            throw new IOException("Invalid SIP request line:'"+requestLine+"'");
-            }
-        
-        final String method = matcher.group(1);
-        if (LOG.isDebugEnabled())
-            {
-            LOG.debug("Got method: "+method+" for request line: "+requestLine);
-            }
-        
-        if (StringUtils.isBlank(method))
-            {
-            LOG.warn("Blank method string!!");
-            }
-        if (!this.m_requestFactories.containsKey(method.toLowerCase()))
-            {
-            LOG.warn("Did not recognize method: "+method);
-            // Handle the case where the first INVITE indicating the message
-            // type mysteriously doesn't come through.  Just add the INVITE to
-            // beginning as if it were there all along.
-            // TODO: Obviously ugly and horrible.  We need to figure out why
-            // this could ever happen and fix the problem.
-            final String trimmedRequestLine = requestLine.trim(); 
-            if (trimmedRequestLine.startsWith("sip:"))
-                {
-                LOG.debug("Treating as an INVITE");
-                return toRequestFactory("INVITE "+trimmedRequestLine);
-                }
-            return this.m_unknownRequestFactory;
-            }
-   
-        return (SingleSipMessageFactory) this.m_requestFactories.get(
-            method.toLowerCase());
-        }
-
-    private SipMessage createResponse(final String responseLine, 
-        final Map headers, final byte[] body) throws IOException
-        {
-        if (LOG.isDebugEnabled())
-            {
-            LOG.debug("Creating SIP response from response line: " + 
-                responseLine);
-            }
-        
-        final Matcher matcher = RESPONSE_CODE.matcher(responseLine);
-        if (!matcher.find())
-            {
-            throw new IOException(
-                "Could not parse response line: "+responseLine);
-            }
-        
-        final String responseCodeString = matcher.group(1);
-        final int responseCode = Integer.parseInt(responseCodeString);
-        return createResponse(responseCode, responseLine, headers, body);
-        }
-
-    private SipMessage createResponse(final int responseCode, 
-        final String responseLine, final Map headers, final byte[] body) 
-        throws IOException
-        {
-        switch (responseCode)
-            {
-            case SipResponseCode.OK:
-                LOG.trace("Processing 200 OK!!!");
-                return new OkResponse(responseLine, headers, body);
-            case SipResponseCode.REQUEST_TIMEOUT:
-                LOG.trace("Processing 200 OK!!!");
-                return new RequestTimeoutResponse(responseLine, headers);
-            default:
-                LOG.warn("Did not understand response: "+responseLine);
-                throw new IOException(
-                    "Did not understand response: "+responseLine);
-            }
-        }
-
-    public SipMessage createRegisterRequest(final URI requestUri, 
+    public Register createRegisterRequest(final URI requestUri, 
         final String displayName, final URI toUri, final UUID instanceId, 
         final URI contactUri)
         {
-        final String requestLine = 
-            "REGISTER "+requestUri.toASCIIString()+" SIP/2.0";
-        
         // TODO: Are we even supposed to include the content length header
         // in register requests?
-        final Map headers = createHeaders("REGISTER", displayName, toUri, 
-            toUri, instanceId, contactUri, 0);
-        return new Register(requestLine, headers);
+        final Map<String, SipHeader> headers =
+            createHeaders("REGISTER", displayName, toUri, toUri, instanceId, 
+            contactUri, 0);
+        return new Register(requestUri, headers);
         }
     
-    public SipMessage createInviteRequest(final String displayName, 
+    public Invite createInviteRequest(final String displayName, 
         final URI toUri, final URI fromUri, final UUID instanceId, 
-        final URI contactUri, final byte[] body)
+        final URI contactUri, final ByteBuffer body)
         {
-        final String requestLine = "INVITE " + toUri + " SIP/2.0";
-        final Map headers = createHeaders("INVITE", displayName, toUri, fromUri,
-            instanceId, contactUri, body.length);
-        return new Invite(requestLine, headers, body);
+        final Map<String, SipHeader> headers = 
+            createHeaders("INVITE", displayName, toUri, fromUri,
+            instanceId, contactUri, body.capacity());
+        return new Invite(toUri, headers, body);
         }
     
-    private Map createHeaders(final String method, final String displayName, 
+    private Map<String, SipHeader> createHeaders(final String method, 
+        final String displayName, 
         final URI toUri, final URI fromUri, final UUID instanceId, 
         final URI contactUri, final int contentLength)
         {
-        final Map headers = new ConcurrentHashMap();
+        final Map<String, SipHeader> headers = 
+            new ConcurrentHashMap<String, SipHeader>();
         SipHeader curHeader = this.m_headerFactory.createMaxForwards(70);
         headers.put(curHeader.getName(), curHeader);
         curHeader = this.m_headerFactory.createTo(toUri);
@@ -241,79 +95,86 @@ public class SipMessageFactoryImpl implements SipMessageFactory
         return headers;
         }
     
-    public SipMessage createInviteOk(final Invite request, 
-        final UUID instanceId, final URI contactUri, final byte[] body)
+    public SipResponse createInviteOk(final Invite request, 
+        final UUID instanceId, final URI contactUri, final ByteBuffer body)
         {
-        if (ArrayUtils.isEmpty(body))
-            {
-            LOG.error("Sending INVITE OK with no body!!!");
-            }
-        final Map headers = createResponseHeaders(request);
+        final Map<String, SipHeader> headers = createResponseHeaders(request);
         addRecordRoute(request, headers);
         addContact(headers, instanceId, contactUri);
-        addContentLength(headers, body.length);
+        addContentLength(headers, body.capacity());
         
-        final SipMessage msg = 
-            new SipMessageImpl("SIP/2.0 200 OK", headers, body);
-        
-        if (LOG.isDebugEnabled())
-            {
-            LOG.debug("Returning OK to INVITE:" + request);
-            LOG.debug("OK:                    " + msg);
-            }
-        return msg;
+        final SipResponse response = new SipResponse(200, "OK", headers, body);
+        return response;
         }
     
-    public SipMessage addVia(final SipMessage message, 
+    public Register addVia(final Register message, final SipHeader newHeader)
+        {
+        final Map<String, SipHeader> headers = 
+            addVia(message.getHeaders(), newHeader);
+        return new Register(message.getStartLine(), headers, message.getBody());
+        }
+
+    public Invite addVia(final Invite message, final SipHeader newHeader)
+        {
+        final Map<String, SipHeader> headers = 
+            addVia(message.getHeaders(), newHeader);
+        return new Invite(message.getStartLine(), headers, message.getBody());
+        }
+
+    private Map<String, SipHeader> addVia(final Map<String, SipHeader> headers, 
         final SipHeader newHeader)
         {
-        // Note this is actually a copy of the headers.
-        final Map headers = message.getHeaders();
-        final SipHeader header = (SipHeader) headers.get(newHeader.getName());
+        final SipHeader header = headers.get(newHeader.getName());
         if (header == null)
             {
             headers.put(newHeader.getName(), newHeader);
             }
         else
             {
-            final List values = header.getValues();
+            final List<SipHeaderValue> values = header.getValues();
             values.addAll(0, newHeader.getValues());
             
             final SipHeader copy = 
                 new SipHeaderImpl(newHeader.getName(), values);
             headers.put(copy.getName(), copy);
+            if (LOG.isDebugEnabled())
+                {
+                LOG.debug("Created new Via header: "+copy);
+                }
             }
-        
-        return new SipMessageImpl(message.getStartLine(), headers, 
-            message.getBody());
+        return headers;
         }
     
-    public SipMessage stripVia(final SipMessage response)
+    public SipResponse stripVia(final SipResponse response)
         {
         // Remove the top Via header.
-        final Map headers = response.getHeaders();
-        final SipHeader viaHeader = 
-            (SipHeader) headers.remove(SipHeaderNames.VIA);
-        final List vias = viaHeader.getValues();
-        final SipHeaderValue ourVia = (SipHeaderValue) vias.remove(0);
+        final Map<String, SipHeader> headers = response.getHeaders();
+        final SipHeader viaHeader = headers.remove(SipHeaderNames.VIA);
+        final List<SipHeaderValue> vias = viaHeader.getValues();
+        final SipHeaderValue ourVia = vias.remove(0);
         
         final SipHeader strippedVia = 
             new SipHeaderImpl(SipHeaderNames.VIA, vias);
         headers.put(SipHeaderNames.VIA, strippedVia);
-        LOG.debug("Removed Via header: "+ourVia);
-        return new SipMessageImpl(response.getStartLine(), headers, 
+        if (LOG.isDebugEnabled())
+            {
+            LOG.debug("Removed Via header: "+ourVia);
+            }
+        return new SipResponse(response.getStatusCode(), 
+            response.getReasonPhrase(), headers, 
             response.getBody());
         }
 
-    public SipMessage createRegisterOk(final Register request)
+    public SipResponse createRegisterOk(final Register request)
         {
-        final Map headers = createResponseHeaders(request);
+        final Map<String, SipHeader> headers = 
+            createResponseHeaders(request);
         
         // Add the supported header to indicated supported extensions.  
         // We support the sip outbound extension, for example.
         final SipHeader supported = this.m_headerFactory.createSupported();
         headers.put(supported.getName(), supported);
-        return new SipMessageImpl("SIP/2.0 200 OK", headers);
+        return new SipResponse(200, "OK", headers, EMPTY_BODY);
         }
 
     /**
@@ -324,7 +185,7 @@ public class SipMessageFactoryImpl implements SipMessageFactory
      * @param instanceId The instance ID of the user.
      * @param contactUri The contact URI of the user.
      */
-    private void addContact(final Map headers, 
+    private void addContact(final Map<String, SipHeader> headers, 
         final UUID instanceId, final URI contactUri)
         {
         final SipHeader contact = 
@@ -338,7 +199,8 @@ public class SipMessageFactoryImpl implements SipMessageFactory
      * @param headers The group of headers to add the Content-Length header to.
      * @param length The length of the content in bytes.
      */
-    private void addContentLength(final Map headers, final int length)
+    private void addContentLength(final Map<String, SipHeader> headers, 
+        final int length)
         {
         final SipHeader contentLength =
             this.m_headerFactory.createContentLength(length);
@@ -352,22 +214,26 @@ public class SipMessageFactoryImpl implements SipMessageFactory
      * @param request The request to copy the header from.
      * @param headers The headers to copy into.
      */
-    private void addRecordRoute(final Invite request, final Map headers)
+    private void addRecordRoute(final Invite request, 
+        final Map<String, SipHeader> headers)
         {
         copyHeader(headers, request, SipHeaderNames.RECORD_ROUTE);
         }
     
-    public SipMessage createRequestTimeoutResponse(final SipMessage request)
+    public SipResponse createRequestTimeoutResponse(
+        final SipMessage request)
         {
-        final Map headers = createResponseHeaders(request);
-        return new SipMessageImpl("SIP/2.0 408 Request Timeout", headers);
+        final Map<String, SipHeader> headers = createResponseHeaders(request);
+        return new RequestTimeoutResponse(headers);
         }
 
-    private Map createResponseHeaders(final SipMessage request)
+    private Map<String, SipHeader> createResponseHeaders(
+        final SipMessage request)
         {
         // Copy the request headers into the response, as specified in 
         // RFC 3261 section 8.2.6.2, page 50.
-        final Map headers = new ConcurrentHashMap();
+        final Map<String, SipHeader> headers = 
+            new ConcurrentHashMap<String, SipHeader>();
         copyHeader(headers, request, SipHeaderNames.FROM);
         copyHeader(headers, request, SipHeaderNames.CALL_ID);
         copyHeader(headers, request, SipHeaderNames.CSEQ);
@@ -377,7 +243,8 @@ public class SipMessageFactoryImpl implements SipMessageFactory
         return headers;
         }
 
-    private void handleToHeader(final Map headers, final SipMessage request)
+    private void handleToHeader(final Map<String, SipHeader> headers, 
+        final SipMessage request)
         {
         final SipHeader to = request.getHeader(SipHeaderNames.TO);
         if (to.getValue().hasParam(SipHeaderParamNames.TAG))
@@ -391,7 +258,7 @@ public class SipMessageFactoryImpl implements SipMessageFactory
             }
         }
 
-    private void copyHeader(final Map headers, 
+    private void copyHeader(final Map<String, SipHeader> headers, 
         final SipMessage request, final String headerName)
         {
         final SipHeader header = request.getHeader(headerName);
@@ -408,142 +275,8 @@ public class SipMessageFactoryImpl implements SipMessageFactory
         headers.put(header.getName(), header);
         }
 
-    public SipMessage createSipMessage(final String messageString) 
-        throws IOException  
-        {
-        // Check for the double CRLF keep alive outside of the normal message
-        // reading since the BufferedReader readLine method eats the keep
-        // alive message.
-        if (messageString.startsWith("\r\n\r\n"))
-            {
-            if (LOG.isDebugEnabled())
-                {
-                LOG.debug("Got double CRLF keep alive");
-                }
-            return new DoubleCrlfKeepAlive();
-            }
-        final BufferedReader reader = 
-            new BufferedReader(new StringReader(messageString));
-        
-        return createSipMessage(reader);
-        
-        }
-
-    public SipMessage createSipMessage(final BufferedReader reader) 
-        throws IOException
-        {
-        int bytesRead = 0;
-        final Map headers = new ConcurrentHashMap();
-        final String requestOrResponseLine = reader.readLine();
-        
-        if (requestOrResponseLine == null)
-            {
-            LOG.debug("Could not read request or response line...");
-            return null;
-            }
-        bytesRead += requestOrResponseLine.length() + 2;
-        LOG.debug("Received first line: "+requestOrResponseLine);
-        
-        String curLine = reader.readLine();
-        if (curLine == null)
-            {
-            LOG.debug("Could not read first header...");
-            return null;
-            }
-        
-        // The 2 extra bytes are for the "\r\n".
-        bytesRead += curLine.length() + 2;
-        
-        // Now read all the headers.  The headers are terminated with a CRLF.
-        while (!StringUtils.isBlank(curLine))
-            {
-            LOG.debug(curLine);
-            addHeader(curLine, headers);
-            curLine = reader.readLine();
-            if (curLine == null)
-                {
-                LOG.debug("Could not read current header...");
-                return null;
-                }
-            
-            // The 2 extra bytes are for the "\r\n".
-            bytesRead += curLine.length() + 2;
-            }
-
-        if (LOG.isDebugEnabled())
-            {
-            LOG.debug("Finished reading message headers: "+headers);
-            }
-        final SipHeader contentLength = 
-            (SipHeader) headers.get(SipHeaderNames.CONTENT_LENGTH);
-        if (contentLength == null)
-            {
-            if (LOG.isDebugEnabled())
-                {
-                LOG.debug("Creating empty SIP message for: "+
-                    requestOrResponseLine+" " + 
-                    headers.get(SipHeaderNames.CSEQ));
-                }
-            return createSipMessage(requestOrResponseLine, headers, EMPTY_BODY);
-            }
-        final int length = 
-            Integer.parseInt(contentLength.getValue().getBaseValue());
-        final char[] bodyChars = new char[length];
-        
-        int bytesInBodyRead = 0;
-        while (bytesInBodyRead < length)
-            {
-            final int newBytesRead;
-            try 
-                {
-                newBytesRead = reader.read(bodyChars);
-                }
-            catch (final IOException e)
-                {
-                LOG.warn("Exception reading body!!", e);
-                throw e;
-                }
-            if (newBytesRead == -1)
-                {
-                LOG.debug("Reached end of stream!!");
-                return null;
-                }
-            if (LOG.isDebugEnabled())
-                {
-                LOG.debug("Adding bytes read: "+newBytesRead);
-                }
-            bytesInBodyRead += newBytesRead;
-            }
-        
-        final byte[] body;
-        try
-            {
-            final String bodyString = new String(bodyChars);
-            if (LOG.isDebugEnabled())
-                {
-                LOG.debug("Using body string: "+bodyString);
-                }
-            body = bodyString.getBytes("US-ASCII");
-            }
-        catch (final UnsupportedEncodingException e)
-            {
-            LOG.error("Should NEVER happen", e);
-            throw new IOException("Encoding error");
-            }
-        
-        return createSipMessage(requestOrResponseLine, headers, body);
-        }
-
-    private void addHeader(final String headerString, final Map headers) 
-        throws IOException 
-        {
-        final SipHeader header = 
-            this.m_headerFactory.createHeader(headerString);
-        headers.put(header.getName(), header);        
-        }
-
-    public SipMessage createInviteToForward(
-        final InetSocketAddress socketAddress, final SipMessage invite) 
+    public Invite createInviteToForward(
+        final InetSocketAddress socketAddress, final Invite invite) 
         throws IOException
         {
         final SipHeader via = invite.getHeader(SipHeaderNames.VIA);
@@ -555,13 +288,13 @@ public class SipMessageFactoryImpl implements SipMessageFactory
         // As specified in section 18.2.1 of RFC 3261, we must add the 
         // 'received' parameter to the Via header if the sent-by parameter
         // of the Via differs from the address we see.
-        final List viaValues = via.getValues();
+        final List<SipHeaderValue> viaValues = via.getValues();
         
         if (LOG.isDebugEnabled())
             {
             LOG.debug("Processing "+viaValues.size()+" vias...");
             }
-        final SipHeaderValue viaValue = (SipHeaderValue) viaValues.remove(0);
+        final SipHeaderValue viaValue = viaValues.remove(0);
         final String fullSentByString = 
             StringUtils.substringAfter(viaValue.getBaseValue(), " ");
         if (StringUtils.isBlank(fullSentByString))
@@ -583,7 +316,7 @@ public class SipMessageFactoryImpl implements SipMessageFactory
         final String host = socketAddress.getAddress().getHostAddress();
         final int rport = socketAddress.getPort();        
         
-        final Map params = viaValue.getParams();
+        final Map<String, String> params = viaValue.getParams();
         
         // Only add the received parameter if the hosts differ.
         if (!host.equals(sentByHost))
@@ -608,13 +341,13 @@ public class SipMessageFactoryImpl implements SipMessageFactory
             new SipHeaderImpl(SipHeaderNames.VIA, viaValues);
         
         // Note this returns a full copy of the headers.
-        final Map headers = invite.getHeaders();
+        final Map<String, SipHeader> headers = invite.getHeaders();
         
         // We actually want to replace the old Via with the new Via 
         // containing the new parameter as opposed to adding a Via 
         // header.
         headers.put(newVia.getName(), newVia);
-        return new SipMessageImpl(invite.getStartLine(), headers, 
+        return new Invite(invite.getStartLine(), headers, 
             invite.getBody());
         }
     }

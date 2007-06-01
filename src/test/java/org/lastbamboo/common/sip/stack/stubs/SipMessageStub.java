@@ -1,10 +1,10 @@
 package org.lastbamboo.common.sip.stack.stubs;
 
-import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.mina.common.ByteBuffer;
+import org.lastbamboo.common.sip.stack.codec.SipMethod;
 import org.lastbamboo.common.sip.stack.message.SipMessage;
 import org.lastbamboo.common.sip.stack.message.SipMessageVisitor;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
@@ -21,15 +21,10 @@ public class SipMessageStub implements SipMessage
         return null;
         }
 
-    public String getMethod()
+    public SipMethod getMethod()
         {
         // TODO Auto-generated method stub
         return null;
-        }
-
-    public byte[] getBytes()
-        {
-        return ArrayUtils.EMPTY_BYTE_ARRAY;
         }
 
     public SipHeader getHeader(String headerName)
@@ -44,21 +39,10 @@ public class SipMessageStub implements SipMessage
         return null;
         }
 
-    public ByteBuffer toByteBuffer()
-        {
-        return ByteBuffer.wrap(getBytes());
-        }
-
-    public byte[] getBody()
+    public ByteBuffer getBody()
         {
         // TODO Auto-generated method stub
         return null;
-        }
-
-    public int getTotalLength()
-        {
-        // TODO Auto-generated method stub
-        return 0;
         }
 
     public void accept(SipMessageVisitor visitor)
@@ -73,14 +57,9 @@ public class SipMessageStub implements SipMessage
         return null;
         }
 
-    public Map getHeaders()
+    public Map<String, SipHeader> getHeaders()
         {
         // TODO Auto-generated method stub
         return null;
-        }
-
-    public String toString()
-        {
-        return new String(getBytes());
         }
     }

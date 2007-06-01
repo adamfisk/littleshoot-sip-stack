@@ -23,7 +23,7 @@ public final class SipHeaderNames
     public static final String RECORD_ROUTE = "Record-Route";
     
     /**
-     * Contant for the Supported header.
+     * Constant for the Supported header.
      */
     public static final String SUPPORTED = "Supported";
     

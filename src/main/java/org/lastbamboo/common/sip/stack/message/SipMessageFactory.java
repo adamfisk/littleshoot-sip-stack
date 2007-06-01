@@ -1,11 +1,11 @@
 package org.lastbamboo.common.sip.stack.message;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 
 import org.apache.commons.id.uuid.UUID;
+import org.apache.mina.common.ByteBuffer;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 
 /**
@@ -13,15 +13,6 @@ import org.lastbamboo.common.sip.stack.message.header.SipHeader;
  */
 public interface SipMessageFactory
     {
-    
-    /**
-     * Creates a new SIP message from the data in the specified reader.
-     * 
-     * @param reader The reader containing the message data.
-     * @return A new SIP message from the reader data.
-     * @throws IOException If any unexpected error occurs creating the message.
-     */
-    SipMessage createSipMessage(final BufferedReader reader) throws IOException;
 
     /**
      * Creates a new register request.
@@ -33,7 +24,7 @@ public interface SipMessageFactory
      * @param contactUri The contact URI of the registering SIP entity.
      * @return The new SIP register request.
      */
-    SipMessage createRegisterRequest(final URI requestUri, 
+    Register createRegisterRequest(final URI requestUri, 
         final String displayName, final URI toUri, final UUID instanceId, 
         final URI contactUri);
 
@@ -50,9 +41,9 @@ public interface SipMessageFactory
      * @param body The body of the INVITE.  This is typcically SDP.
      * @return The new invite.
      */
-    SipMessage createInviteRequest(final String displayName, 
+    Invite createInviteRequest(final String displayName, 
         final URI toUri, URI fromUri, final UUID instanceId, 
-        final URI contactUri, final byte[] body);
+        final URI contactUri, final ByteBuffer body);
     
     /**
      * Creates a new INVITE OK message, copying data from the specified request.
@@ -63,8 +54,8 @@ public interface SipMessageFactory
      * @param body The body of the message.
      * @return A new INVITE OK with the specified data.
      */
-    SipMessage createInviteOk(final Invite request, final UUID instanceId, 
-        final URI contactUri, final byte[] body);
+    SipResponse createInviteOk(Invite request, UUID instanceId, 
+        URI contactUri, ByteBuffer body);
 
     /**
      * Creates a register OK message from the specified request.
@@ -72,7 +63,7 @@ public interface SipMessageFactory
      * @param register The register request to create an OK response for.
      * @return The register OK response.
      */
-    SipMessage createRegisterOk(final Register register);
+    SipResponse createRegisterOk(Register register);
 
     /**
      * Creates a SIP message from the specified message string.
@@ -81,18 +72,30 @@ public interface SipMessageFactory
      * @return The new SIP message.
      * @throws IOException If there's an IO error reading the message.
      */
-    SipMessage createSipMessage(final String messageString) throws IOException;
+    //SipMessage createSipMessage(final String messageString) throws IOException;
 
     /**
      * Copies all the data from the original message into a new message,
-     * adding the specified header.
+     * adding the specified Via header.
      * 
      * @param message The original message to create a new message from.
-     * @param newHeader The header to add.
+     * @param newHeader The Via header to add.
      * @return A new SIP message with all the data from the original message
      * plus the specified header.
      */
-    SipMessage addVia(final SipMessage message, final SipHeader newHeader);
+    Invite addVia(final Invite message, final SipHeader newHeader);
+    
+    /**
+     * Copies all the data from the original message into a new message,
+     * adding the specified Via header.
+     * 
+     * @param request The original message to create a new message from.
+     * @param via The Via header to add.
+     * @return A new SIP message with all the data from the original message
+     * plus the specified header.
+     */
+    Register addVia(Register request, SipHeader via);
+
 
     /**
      * Strips the topmost Via header from the response, returning a new message
@@ -101,7 +104,7 @@ public interface SipMessageFactory
      * @param response The response message to strip the Via from.
      * @return The new message without the topmost Via header from the original.
      */
-    SipMessage stripVia(final SipMessage response);
+    SipResponse stripVia(final SipResponse response);
 
     /**
      * Creates a 408 Request Timeout response.
@@ -109,7 +112,7 @@ public interface SipMessageFactory
      * @param request The request that timed out.
      * @return The 408 Request Timeout response.
      */
-    SipMessage createRequestTimeoutResponse(final SipMessage request);
+    SipResponse createRequestTimeoutResponse(SipMessage request);
 
     /**
      * Creates a new message to forward with all of the appropriate 
@@ -122,7 +125,7 @@ public interface SipMessageFactory
      * Via header.
      * @throws IOException If the message does not match the expected syntax.
      */
-    SipMessage createInviteToForward(final InetSocketAddress socketAddress, 
-        final SipMessage invite) throws IOException;
+    Invite createInviteToForward(final InetSocketAddress socketAddress, 
+        final Invite invite) throws IOException;
 
     }

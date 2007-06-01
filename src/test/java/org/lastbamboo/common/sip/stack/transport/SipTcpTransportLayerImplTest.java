@@ -3,20 +3,19 @@ package org.lastbamboo.common.sip.stack.transport;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
-import org.lastbamboo.common.protocol.ReaderWriter;
+import junit.framework.TestCase;
+
+import org.apache.mina.common.IoSession;
 import org.lastbamboo.common.sip.stack.message.SipMessageFactory;
 import org.lastbamboo.common.sip.stack.message.SipMessageFactoryImpl;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactoryImpl;
-import org.lastbamboo.common.sip.stack.stubs.ReaderWriterStub;
-import org.lastbamboo.common.sip.stack.stubs.SipMessageStub;
+import org.lastbamboo.common.sip.stack.stubs.IoSessionStub;
+import org.lastbamboo.common.sip.stack.stubs.SipResponseStub;
 import org.lastbamboo.common.sip.stack.transaction.SipTransactionFactory;
 import org.lastbamboo.common.sip.stack.transaction.SipTransactionFactoryImpl;
 import org.lastbamboo.common.sip.stack.transaction.SipTransactionTracker;
 import org.lastbamboo.common.sip.stack.transaction.SipTransactionTrackerImpl;
-import org.lastbamboo.common.sip.stack.transport.SipTcpTransportLayerImpl;
-
-import junit.framework.TestCase;
 
 /**
  * Test for the TCP transport layer.
@@ -43,21 +42,20 @@ public class SipTcpTransportLayerImplTest extends TestCase
             new SipTcpTransportLayerImpl(transactionFactory, headerFactory, 
                 messageFactory);
         
-        //final InetSocketAddress sa = 
-            
-        final ReaderWriter rw = new ReaderWriterStub();
-        final InetSocketAddress sa = rw.getRemoteSocketAddress();
-        transport.addConnection(rw);
+        //final ReaderWriter rw = new ReaderWriterStub();
+        final IoSession io = new IoSessionStub();
+        final InetSocketAddress sa = (InetSocketAddress) io.getRemoteAddress();
+        transport.addConnection(io);
         
         final InetSocketAddress sa2 = 
             new InetSocketAddress("208.54.95.129", 1178);
         
-        assertTrue(transport.writeResponse(sa2, new SipMessageStub()));
+        assertTrue(transport.writeResponse(sa2, new SipResponseStub()));
         
         final InetSocketAddress sa3 = 
             new InetSocketAddress(InetAddress.getByName("208.54.95.129"), 1178);
         
-        assertTrue(transport.writeResponse(sa2, new SipMessageStub()));
+        assertTrue(transport.writeResponse(sa2, new SipResponseStub()));
         
         assertEquals(sa.getAddress(), sa3.getAddress());
         }

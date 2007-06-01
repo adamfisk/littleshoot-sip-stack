@@ -7,20 +7,25 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
+import org.lastbamboo.common.sip.stack.message.header.SipHeaderImpl;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderNames;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderParamNames;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderValue;
+import org.lastbamboo.common.sip.stack.message.header.SipHeaderValueImpl;
 
 /**
  * Collection of utility methods for handling SIP messages.
@@ -29,9 +34,6 @@ public class SipMessageUtils
     {
 
     private static final Log LOG = LogFactory.getLog(SipMessageUtils.class);
-    
-    private static final Pattern METHOD_WHITESPACE = 
-        Pattern.compile("(\\w+)\\s+");
     
     private SipMessageUtils()
         {
@@ -59,32 +61,6 @@ public class SipMessageUtils
             sb.append(param.getValue());
             }
         return sb.toString();
-        }
-    
-    /**
-     * Extracts the method of the request.
-     * @param requestLine The request line containing the request method as the
-     * first word.
-     * @return The request method for the request.
-     * @throws IOException If there's any error parsing the input.
-     */
-    public static RequestMethod extractRequestMethod(final String requestLine) 
-        throws IOException
-        {
-        final Matcher matcher = METHOD_WHITESPACE.matcher(requestLine);
-        if (!matcher.find())
-            {
-            throw new IOException("Invalid SIP request line: "+requestLine);
-            }
-        
-        final String method = matcher.group(1);
-        LOG.debug("Got method: "+method);
-        
-        if (StringUtils.isBlank(method))
-            {
-            LOG.warn("Blank method string!!");
-            }
-        return RequestMethod.getMethod(method);
         }
 
     public static String extractName(final String nameValue) 
@@ -120,14 +96,63 @@ public class SipMessageUtils
             }
         return value.trim();
         }
+    
+    public static Map<String, SipHeader> convertHeaders(
+        Map<String, List<String>> headers)
+        {
+        final Map<String, SipHeader> newHeaders = 
+            new HashMap<String, SipHeader>();
+        
+        final Set<Map.Entry<String, List<String>>> entries = 
+            headers.entrySet();
+        for (final Map.Entry<String, List<String>> entry : entries)
+            {
+            final List<String> values = entry.getValue();
+            final List<SipHeaderValue> headerValues = createValues(values);
+            final SipHeader header = 
+                new SipHeaderImpl(entry.getKey(), headerValues);
+            newHeaders.put(header.getName(), header);
+            }
+        return newHeaders;
+        }
+    
+    private static List<SipHeaderValue> createValues(final List<String> values)
+        {
+        final List<SipHeaderValue> headerValues = 
+            new LinkedList<SipHeaderValue>();
+        
+        for (final String value : values)
+            {
+            // We use a scanner here because the "value" from the list of
+            // strings can actually contain two values separated with a comma.
+            final Scanner scan = new Scanner(value);
+            scan.useDelimiter(",");
+            while (scan.hasNext())
+                {
+                final String curValue = scan.next();
+                try
+                    {
+                    final SipHeaderValue headerValue = 
+                        new SipHeaderValueImpl(curValue);
+                    headerValues.add(headerValue);
+                    }
+                catch (final IOException e)
+                    {
+                    LOG.warn("Could not parse header value: "+value);
+                    }
+                }
+            }
+        return headerValues;
+        }
 
-    public static Map extractHeaderParams(final String headerValue) 
-        throws IOException
+    public static Map<String, String> extractHeaderParams(
+        final String headerValue) throws IOException
         {
         final String paramsString = 
             StringUtils.substringAfter(headerValue, ";");
         final String[] paramStrings = StringUtils.split(paramsString, ";");
-        final Map paramMap = new ConcurrentHashMap();
+        final Map<String, String> paramMap = 
+            new ConcurrentHashMap<String, String>();
         for (int i = 0; i < paramStrings.length; i++)
             {
             final String nameValue = paramStrings[i].trim();
@@ -188,6 +213,9 @@ public class SipMessageUtils
         final SipHeaderValue cSeqValue = 
             message.getHeader(SipHeaderNames.CSEQ).getValue();
         final String cSeqString = cSeqValue.getBaseValue();
+        //final String cSeqString = message.getHeader(SipHeaderNames.CSEQ);
+        //final SipHeaderValue cSeqValue = header.getValue();
+        //final String cSeqString = cSeqValue.getBaseValue();
         final String sequenceString = 
             StringUtils.substringBefore(cSeqString, " ");
         if (!NumberUtils.isNumber(sequenceString))
@@ -302,5 +330,21 @@ public class SipMessageUtils
             }
         
         return new InetSocketAddress(hostString, port);
+        }
+
+    public static int extractContentLength(Map<String, SipHeader> headers)
+        {
+        final SipHeader header = headers.get(SipHeaderNames.CONTENT_LENGTH);
+        if (header == null)
+            {
+            return 0;
+            }
+        final String lengthString = header.getValue().getBaseValue();
+        if (!NumberUtils.isNumber(lengthString))
+            {
+            LOG.warn("Content-Length not a number: " + lengthString);
+            return 0;
+            }
+        return Integer.parseInt(lengthString);
         }
     }

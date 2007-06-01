@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Collection;
 
-import org.lastbamboo.common.protocol.ReaderWriter;
-import org.lastbamboo.common.sip.stack.message.SipMessage;
+import org.apache.mina.common.IoSession;
+import org.lastbamboo.common.sip.stack.message.Invite;
+import org.lastbamboo.common.sip.stack.message.Register;
+import org.lastbamboo.common.sip.stack.message.SipResponse;
 import org.lastbamboo.common.sip.stack.transaction.SipClientTransaction;
 import org.lastbamboo.common.sip.stack.transaction.SipTransactionListener;
 
@@ -20,9 +22,23 @@ public interface SipTcpTransportLayer
      * Adds a mapping between the remote host for the connection and
      * the class for reading and writing data from and to that host.
      * 
-     * @param readerWriter The connection to the host.
+     * @param io The connection to the host.
      */
-    void addConnection(ReaderWriter readerWriter);
+    void addConnection(IoSession io);
+    
+    /**
+     * Writes a REGISTER request that is a part of a transaction.  This method 
+     * should add the transaction to a transaction map prior to sending it to 
+     * ensure we don't receive responses prior to the maintaining data for the 
+     * transaction.
+     * 
+     * @param message The SIP message we're sending.
+     * @param io The class for writing the message.
+     * @param listener Class that listens for transaction events.
+     * @return The client transaction for the request.
+     */
+    SipClientTransaction register(Register message, 
+        IoSession io, SipTransactionListener listener);
 
     /**
      * Writes a message that is a part of a transaction.  This method should
@@ -31,21 +47,20 @@ public interface SipTcpTransportLayer
      * transaction.
      * 
      * @param message The SIP message we're sending.
-     * @param readerWriter The class for writing the message.
+     * @param io The class for writing the message.
      * @param listener Class that listens for transaction events.
      * @return The client transaction for the request.
      */
-    SipClientTransaction writeRequest(SipMessage message, 
-        ReaderWriter readerWriter, SipTransactionListener listener);
+    SipClientTransaction writeRequest(Invite message, 
+        IoSession io, SipTransactionListener listener);
 
     /**
      * Writes the specified request without creating a transaction.
      * 
      * @param request The SIP request to write.
-     * @param readerWriter
+     * @param io The class that will write hte message.
      */
-    void writeRequestStatelessly(final SipMessage request, 
-        final ReaderWriter readerWriter);
+    void writeRequestStatelessly(Invite request, IoSession io);
 
     /**
      * Writes the specified response message to the connection associated with
@@ -58,7 +73,7 @@ public interface SipTcpTransportLayer
      * response and passed it to the network for transport, otherwise 
      * <code>false</code>.
      */
-    boolean writeResponse(InetSocketAddress socketAddress, SipMessage response);
+    boolean writeResponse(InetSocketAddress socketAddress, SipResponse response);
 
     /**
      * Writes a response using the routing information in the topmost Via 
@@ -67,7 +82,7 @@ public interface SipTcpTransportLayer
      * @param response The response to write.
      * @throws IOException If we could not route the response for any reason.
      */
-    void writeResponse(SipMessage response) throws IOException;
+    void writeResponse(SipResponse response) throws IOException;
 
     /**
      * Checks whether or not the transport layer has a connection to any
@@ -77,7 +92,7 @@ public interface SipTcpTransportLayer
      * @return <code>true</code> if there is a connection to any of the 
      * specified addresses, otherwise <code>false</code>.
      */
-    boolean hasConnectionForAny(Collection socketAddresses);
+    boolean hasConnectionForAny(Collection<InetSocketAddress> socketAddresses);
 
     /**
      * Writes the specified request to the first address in the collection
@@ -87,7 +102,8 @@ public interface SipTcpTransportLayer
      * message to.
      * @param request The request to send.
      */
-    void writeRequest(Collection socketAddresses, SipMessage request);
+    void writeRequest(Collection<InetSocketAddress> socketAddresses, 
+        Invite request);
 
     /**
      * Writes a CRLF keep-alive message to the given reader/writer, as
@@ -95,8 +111,15 @@ public interface SipTcpTransportLayer
      * from closing active connections and supplies insurance to detect when
      * connections have been closed.
      * 
-     * @param readerWriter The reader/writer to write the messages over.
+     * @param io The reader/writer to write the messages over.
      */
-    void writeCrlfKeepAlive(ReaderWriter readerWriter);
+    void writeCrlfKeepAlive(IoSession io);
+
+    /**
+     * Removes this connection.
+     * 
+     * @param session The connection to remove.
+     */
+    void removeConnection(IoSession session);
 
     }

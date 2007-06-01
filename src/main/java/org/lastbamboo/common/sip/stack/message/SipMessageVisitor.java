@@ -5,14 +5,6 @@ package org.lastbamboo.common.sip.stack.message;
  */
 public interface SipMessageVisitor
     {
-
-    /**
-     * Visits a 200 OK response.  This can be for any type of request, such
-     * as REGISTER or INVITE.
-     * 
-     * @param response The response message.
-     */
-    void visitOk(final OkResponse response);
     
     /**
      * Visits a 408 Request Timeout response.
@@ -39,7 +31,7 @@ public interface SipMessageVisitor
      * 
      * @param request A request we do not recognize.
      */
-    void visitUnknownRequest(final UnknownMessage request);
+    void visitUnknownRequest(UnknownSipRequest request);
 
     /**
      * Visits a double CRLF keep alive message, as specified at:<p>
@@ -49,4 +41,11 @@ public interface SipMessageVisitor
      * @param keepAlive The keep alive message.
      */
     void visitDoubleCrlfKeepAlive(DoubleCrlfKeepAlive keepAlive);
+
+    /**
+     * Visits a response message.
+     * 
+     * @param response The response.
+     */
+    void visitResponse(SipResponse response);
     }

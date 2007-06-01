@@ -9,12 +9,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lastbamboo.common.sip.stack.message.DoubleCrlfKeepAlive;
 import org.lastbamboo.common.sip.stack.message.Invite;
-import org.lastbamboo.common.sip.stack.message.OkResponse;
 import org.lastbamboo.common.sip.stack.message.Register;
 import org.lastbamboo.common.sip.stack.message.RequestTimeoutResponse;
 import org.lastbamboo.common.sip.stack.message.SipMessage;
 import org.lastbamboo.common.sip.stack.message.SipMessageFactory;
-import org.lastbamboo.common.sip.stack.message.UnknownMessage;
+import org.lastbamboo.common.sip.stack.message.SipResponse;
+import org.lastbamboo.common.sip.stack.message.UnknownSipRequest;
 
 /**
  * Implementation of a SIP client transaction.
@@ -90,28 +90,35 @@ public class SipClientTransactionImpl implements SipClientTransaction
         {
         return m_transactionTime;
         }
-
-    public void visitOk(final OkResponse response)
+    
+    public void visitResponse(final SipResponse response)
         {
         if (this.m_timerBFired)
             {
-            LOG.warn("Received OK after timer B fired!!");
+            LOG.warn("Received response after timer B fired!!");
             return;
             }
         // Tell timer B not to fire.
         this.m_timerB.cancel();
         
-        setTransactionTime();
-        if (LOG.isDebugEnabled())
+        if (response.getStatusCode() == 200)
             {
-            LOG.debug("Transaction time: "+getTransactionTime());
+            setTransactionTime();
+            if (LOG.isDebugEnabled())
+                {
+                LOG.debug("Transaction time: "+getTransactionTime());
+                }
+            for (final Iterator iter = this.m_transactionListeners.iterator(); 
+                iter.hasNext();)
+                {
+                final SipTransactionListener listener = 
+                    (SipTransactionListener) iter.next();
+                listener.onTransactionSucceeded(response);
+                }
             }
-        for (final Iterator iter = this.m_transactionListeners.iterator(); 
-            iter.hasNext();)
+        else
             {
-            final SipTransactionListener listener = 
-                (SipTransactionListener) iter.next();
-            listener.onTransactionSucceeded(response);
+            LOG.warn("Received non OK response: "+response.getStatusCode());
             }
         }
 
@@ -157,7 +164,7 @@ public class SipClientTransactionImpl implements SipClientTransaction
             register);
         }
 
-    public void visitUnknownRequest(final UnknownMessage request)
+    public void visitUnknownRequest(final UnknownSipRequest request)
         {
         LOG.warn("Should not receive unknown messages on client " +
             "transactions: "+request);

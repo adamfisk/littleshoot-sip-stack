@@ -41,6 +41,6 @@ public interface SipHeaderValue
      * 
      * @return The map of header value parameters.
      */
-    Map getParams();
+    Map<String, String> getParams();
 
     }

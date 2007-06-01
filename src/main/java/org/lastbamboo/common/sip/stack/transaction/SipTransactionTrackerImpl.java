@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.lastbamboo.common.sip.stack.codec.SipMethod;
 import org.lastbamboo.common.sip.stack.message.SipMessage;
 
 /**
@@ -51,8 +52,8 @@ public class SipTransactionTrackerImpl implements SipTransactionTracker,
     private String getTransactionKey(final SipMessage message)
         {
         final String branchId = message.getBranchId();
-        final String method = message.getMethod();
-        return branchId + method;
+        final SipMethod method = message.getMethod();
+        return branchId + method.toString();
         }
 
     public void onTransactionSucceeded(final SipMessage message)

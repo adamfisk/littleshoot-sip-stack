@@ -2,12 +2,10 @@ package org.lastbamboo.common.sip.stack.util;
 
 import java.net.URI;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.lastbamboo.common.sip.stack.util.UriUtils;
-import org.lastbamboo.common.sip.stack.util.UriUtilsImpl;
-
-import junit.framework.TestCase;
 
 /**
  * Test for the UriUtils class.

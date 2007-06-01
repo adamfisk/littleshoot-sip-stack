@@ -1,11 +1,11 @@
 package org.lastbamboo.common.sip.stack.message;
 
-import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.mina.common.ByteBuffer;
+import org.lastbamboo.common.sip.stack.codec.SipMethod;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.util.StringUtils;
 
@@ -18,17 +18,19 @@ import org.lastbamboo.common.util.StringUtils;
 public class DoubleCrlfKeepAlive implements SipMessage
     {
 
-    private static final byte[] DOUBLE_CRLF = 
-        StringUtils.toAsciiBytes("\r\n\r\n");
+    private static final ByteBuffer DOUBLE_CRLF = 
+        ByteBuffer.wrap(StringUtils.toAsciiBytes("\r\n\r\n"));
+    
+    private static final ByteBuffer EMPTY_BYTE_BUFFER = ByteBuffer.allocate(0);
     
     public void accept(final SipMessageVisitor visitor)
         {
         visitor.visitDoubleCrlfKeepAlive(this);
         }
 
-    public byte[] getBody()
+    public ByteBuffer getBody()
         {
-        return ArrayUtils.EMPTY_BYTE_ARRAY;
+        return EMPTY_BYTE_BUFFER;
         }
 
     public String getBranchId()
@@ -36,7 +38,7 @@ public class DoubleCrlfKeepAlive implements SipMessage
         return org.apache.commons.lang.StringUtils.EMPTY;
         }
 
-    public byte[] getBytes()
+    public ByteBuffer getBytes()
         {
         return DOUBLE_CRLF;
         }
@@ -46,14 +48,14 @@ public class DoubleCrlfKeepAlive implements SipMessage
         return null;
         }
 
-    public Map getHeaders()
+    public Map<String, SipHeader> getHeaders()
         {
         return Collections.emptyMap();
         }
 
-    public String getMethod()
+    public SipMethod getMethod()
         {
-        return org.apache.commons.lang.StringUtils.EMPTY;
+        return SipMethod.DOUBLE_CRLF_KEEP_ALIVE;
         }
 
     public List getRouteSet()
@@ -68,12 +70,7 @@ public class DoubleCrlfKeepAlive implements SipMessage
 
     public int getTotalLength()
         {
-        return DOUBLE_CRLF.length;
-        }
-
-    public ByteBuffer toByteBuffer()
-        {
-        return ByteBuffer.wrap(DOUBLE_CRLF);
+        return DOUBLE_CRLF.capacity();
         }
 
     }
