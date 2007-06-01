@@ -35,7 +35,7 @@ public class SipMessageEncoderImpl implements SipMessageEncoder
         final ByteBuffer buffer = ByteBuffer.allocate(300);
         buffer.setAutoExpand(true);
 
-        encodeStatusLine(message, buffer);
+        encodeStartLine(message, buffer);
         encodeHeaders(message, buffer);
         encodeBody(message, buffer);
         buffer.flip();
@@ -43,23 +43,10 @@ public class SipMessageEncoderImpl implements SipMessageEncoder
         return buffer;
         }
     
-
-    /**
-     * Encodes the status line of a <code>Response</code> to a specified
-     * buffer. The status line takes the form:<br/>
-     * 
-     * <pre>
-     *     HTTP-Version SP Status-Code SP Reason-Phrase CRLF
-     * </pre>
-     * 
-     * @param message The message
-     * @param buffer The buffer
-     * @throws CharacterCodingException If there are any character encoding
-     * problems.
-     */
-    private void encodeStatusLine(final SipMessage message, 
+    private void encodeStartLine(final SipMessage message, 
         final ByteBuffer buffer)
         {
+        LOG.debug("Encoding start line: '{}'", message.getStartLine());
         try
             {
             buffer.putString(message.getStartLine(), m_asciiEncoder);
@@ -71,14 +58,6 @@ public class SipMessageEncoderImpl implements SipMessageEncoder
         SipCodecUtils.appendCRLF(buffer);
         }
 
-    /**
-     * Encodes the headers of a <code>Response</code> to a specified buffer.
-     * This encoder does not make smart decisions about which headers to write -
-     * the response is expected to already contain self-consistent headers.
-     * 
-     * @param message The message whos headers are to be encoded
-     * @param buffer The buffer
-     */
     private void encodeHeaders(final SipMessage message, 
         final ByteBuffer buffer)
         {
