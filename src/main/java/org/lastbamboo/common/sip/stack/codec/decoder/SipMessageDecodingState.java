@@ -52,6 +52,7 @@ public abstract class SipMessageDecodingState extends DecodingStateMachine
     @Override
     protected DecodingState init() throws Exception
         {
+        m_messageFactory = null;
         return new ReadFirstLineState();
         }
 
@@ -135,10 +136,9 @@ public abstract class SipMessageDecodingState extends DecodingStateMachine
                 out.write(message);
                 
                 // No body.  Go back to reading at the beginning.
-                return new ReadFirstLineState();
+                return SipMessageDecodingState.this.init();
                 }
             }
-    
         }
     
     
@@ -147,7 +147,8 @@ public abstract class SipMessageDecodingState extends DecodingStateMachine
 
         private final Map<String, SipHeader> m_headers;
 
-        private ReadBodyState(Map<String, SipHeader> headers, final int length)
+        private ReadBodyState(final Map<String, SipHeader> headers, 
+            final int length)
             {
             super(length);
             m_headers = headers;
@@ -160,7 +161,7 @@ public abstract class SipMessageDecodingState extends DecodingStateMachine
             final SipMessage message = 
                 m_messageFactory.createSipMessage(m_headers, readData);
             out.write(message);
-            return new ReadFirstLineState();
+            return SipMessageDecodingState.this.init();
             }
         }
     }
