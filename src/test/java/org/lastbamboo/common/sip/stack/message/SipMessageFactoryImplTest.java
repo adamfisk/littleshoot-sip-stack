@@ -39,13 +39,8 @@ public class SipMessageFactoryImplTest extends TestCase
             new SipMessageFactoryImpl(headerFactory);
         final InetSocketAddress socketAddress1 = 
             new InetSocketAddress("46.76.232.1", 5525);
-        //final InetSocketAddress socketAddress2 = 
-          //  new InetSocketAddress("46.76.32.1", 3525);
         
         Invite request = createInvite();
-        //final SipHeader startVia = 
-          //  headerFactory.createSentByVia(socketAddress1.getAddress());
-        //request = messageFactory.addVia(request, startVia);
         
         // Forward it so we have a via to strip.
         final Invite invite = 
