@@ -19,7 +19,8 @@ public class SipTransactionTrackerImpl implements SipTransactionTracker,
     private static final Log LOG = 
         LogFactory.getLog(SipTransactionTrackerImpl.class);
     
-    private final Map m_transactions = new ConcurrentHashMap();
+    private final Map<String, SipClientTransaction> m_transactions = 
+        new ConcurrentHashMap<String, SipClientTransaction>();
 
     public void trackTransaction(final SipClientTransaction ct)
         {
@@ -39,8 +40,7 @@ public class SipTransactionTrackerImpl implements SipTransactionTracker,
             LOG.error("Blank key for message: "+message);
             throw new IllegalArgumentException("Bad message: "+message);
             }
-        final SipClientTransaction ct = 
-            (SipClientTransaction) this.m_transactions.get(key);
+        final SipClientTransaction ct = this.m_transactions.get(key);
         if (ct == null)
             {
             LOG.warn("Nothing known about transaction: "+key);
