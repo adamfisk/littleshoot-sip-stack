@@ -36,17 +36,10 @@ public abstract class ConsumeToDynamicTerminatorDecodingState
     private static final Logger LOG = 
         LoggerFactory.getLogger(ConsumeToDynamicTerminatorDecodingState.class);
 
-    private ByteBuffer buffer;
-
-    /**
-     * Creates a new instance.
-     */
-    public ConsumeToDynamicTerminatorDecodingState()
-        {
-        }
+    private ByteBuffer m_buffer;
 
     public DecodingState decode(ByteBuffer in, ProtocolDecoderOutput out)
-            throws Exception
+        throws Exception
         {
         int beginPos = in.position();
         int terminatorPos = -1;
@@ -68,20 +61,17 @@ public abstract class ConsumeToDynamicTerminatorDecodingState
 
             if (beginPos < terminatorPos)
                 {
-                LOG.debug("Made progress...");
                 in.limit(terminatorPos);
 
-                if (buffer == null)
+                if (m_buffer == null)
                     {
-                    LOG.debug("Slicing...");
                     product = in.slice();
                     }
                 else
                     {
-                    LOG.debug("Flipping...");
-                    buffer.put(in);
-                    product = buffer.flip();
-                    buffer = null;
+                    m_buffer.put(in);
+                    product = m_buffer.flip();
+                    m_buffer = null;
                     }
 
                 in.limit(limit);
@@ -90,15 +80,15 @@ public abstract class ConsumeToDynamicTerminatorDecodingState
                 {
                 // When input contained only terminator rather than actual
                 // data...
-                if (buffer == null)
+                if (m_buffer == null)
                     {
                     product = ByteBuffer.allocate(1);
                     product.limit(0);
                     }
                 else
                     {
-                    product = buffer.flip();
-                    buffer = null;
+                    product = m_buffer.flip();
+                    m_buffer = null;
                     }
                 }
             
@@ -107,13 +97,12 @@ public abstract class ConsumeToDynamicTerminatorDecodingState
             }
         else
             {
-            LOG.debug("Terminatory position: "+terminatorPos);
-            if (buffer == null)
+            if (m_buffer == null)
                 {
-                buffer = ByteBuffer.allocate(in.remaining());
-                buffer.setAutoExpand(true);
+                m_buffer = ByteBuffer.allocate(in.remaining());
+                m_buffer.setAutoExpand(true);
                 }
-            buffer.put(in);
+            m_buffer.put(in);
             return this;
             }
         }
