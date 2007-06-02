@@ -7,6 +7,7 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.common.WriteFuture;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
+import org.lastbamboo.common.sip.stack.codec.MinaUtils;
 import org.lastbamboo.common.sip.stack.message.SipMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +38,9 @@ public class SipMessageProtocolEncoder implements ProtocolEncoder,
             LOG.debug("Attempted encodes: "+s_encodeAttempts);
             }
         final ByteBuffer buffer = this.m_encoder.encode((SipMessage) message);
+        LOG.debug("Writing buffer: \n{}", MinaUtils.toAsciiString(buffer));
+        
         out.write(buffer);
-        final WriteFuture wf = out.flush();
-        wf.addListener(this);
         }
 
     public void dispose(IoSession session) throws Exception

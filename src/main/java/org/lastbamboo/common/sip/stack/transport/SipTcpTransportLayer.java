@@ -51,7 +51,7 @@ public interface SipTcpTransportLayer
      * @param listener Class that listens for transaction events.
      * @return The client transaction for the request.
      */
-    SipClientTransaction writeRequest(Invite message, 
+    SipClientTransaction invite(Invite message, 
         IoSession io, SipTransactionListener listener);
 
     /**

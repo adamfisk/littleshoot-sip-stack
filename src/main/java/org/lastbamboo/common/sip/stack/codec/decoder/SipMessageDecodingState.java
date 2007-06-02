@@ -129,14 +129,14 @@ public abstract class SipMessageDecodingState extends DecodingStateMachine
                 }
             else
                 {
-                LOG.debug("Creating no body message");
                 final SipMessage message = 
                     m_messageFactory.createSipMessage(headers, EMPTY_BODY);
                 
                 out.write(message);
                 
-                // No body.  Go back to reading at the beginning.
-                return SipMessageDecodingState.this.init();
+                // We return null here to give back control to the outer
+                // decoding state machine.
+                return null;
                 }
             }
         }
@@ -161,6 +161,7 @@ public abstract class SipMessageDecodingState extends DecodingStateMachine
             final SipMessage message = 
                 m_messageFactory.createSipMessage(m_headers, readData);
             out.write(message);
+            LOG.debug("Finished read body...");
             return SipMessageDecodingState.this.init();
             }
         }

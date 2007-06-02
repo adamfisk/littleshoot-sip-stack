@@ -17,8 +17,6 @@ package org.lastbamboo.common.sip.stack.codec.decoder.support;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -33,8 +31,6 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class FixedLengthDecodingState implements DecodingState 
     {
-    private static final Logger LOG = 
-        LoggerFactory.getLogger(FixedLengthDecodingState.class);
     
     private final int m_length;
 

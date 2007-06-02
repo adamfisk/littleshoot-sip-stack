@@ -92,7 +92,7 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
         this.m_socketAddressesToIo.remove(remoteAddress);
         }
     
-    public SipClientTransaction writeRequest(final Invite request, 
+    public SipClientTransaction invite(final Invite request, 
         final IoSession io, final SipTransactionListener transactionListener)
         {
         if (LOG.isDebugEnabled())
@@ -189,29 +189,8 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
         
         if (io == null)
             {
-            if (LOG.isWarnEnabled())
-                {
-                LOG.warn("No connection for socket address: "+socketAddress);
-                LOG.warn("hashCode(): "+socketAddress.hashCode());
-                if (this.m_socketAddressesToIo.size() < 10)
-                    {
-                    LOG.warn("Existing connections: "+
-                        this.m_socketAddressesToIo);
-                    final StringBuffer sb = new StringBuffer();
-                    final Collection keys = 
-                        this.m_socketAddressesToIo.keySet();
-                    for (final Iterator iter = keys.iterator(); iter.hasNext();)
-                        {
-                        final InetSocketAddress sa = 
-                            (InetSocketAddress) iter.next();
-                        sb.append(sa.toString());
-                        sb.append(" code: ");
-                        sb.append(sa.hashCode());
-                        sb.append(", ");
-                        }
-                    LOG.warn("hashCode()s: "+sb.toString());
-                    }
-                }
+            // This could be bad, although the user may have just left.
+            writeDebugData(socketAddress);
             return false;
             }
         
@@ -221,46 +200,11 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
     
     private void write(final SipMessage message, final IoSession io)
         {
-        if (LOG.isDebugEnabled())
-            {
-            LOG.debug("Writing message: "+message);
-            }
-        /*
-        final ByteBuffer buf = message.getBytes();
-        
-        if (LOG.isDebugEnabled())
-            {
-            
-            final String bufString = buf.toString();
-            final String messageString = message.toString();
-            if (!bufString.equals(messageString))
-                {
-                LOG.warn(bufString + " not equal to " + messageString);
-                }
-            Assert.isTrue(bufString.equals(messageString));
-            }
-        
-        
-        if(LOG.isDebugEnabled())
-            {
-            try
-                {
-                final String messageString = buf.getString(asciiDecoder);
-                LOG.debug("Writing message: "+ messageString);
-                buf.flip();
-                }
-            catch (final CharacterCodingException e)
-                {
-                LOG.error("Bad char encoding", e);
-                }
-            }
-        */
-        
         write(message, io, false);
-        
         }
     
-    private void write(SipMessage message, IoSession io, boolean listen)
+    private void write(final SipMessage message, final IoSession io, 
+        final boolean listen)
         {
         final WriteFuture wf = io.write(message);
         if (listen)
@@ -348,10 +292,30 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
             {
             LOG.debug("Wrote messages: "+ 
                 future.getSession().getWrittenMessages());
-            LOG.debug("Scheduled: " + 
-                future.getSession().getScheduledWriteRequests());
-            LOG.debug("Written: " + 
-                future.getSession().getWrittenWriteRequests());
+            }
+        }
+    
+    private void writeDebugData(InetSocketAddress socketAddress)
+        {
+        LOG.warn("No connection for socket address: "+socketAddress);
+        LOG.warn("hashCode(): "+socketAddress.hashCode());
+        if (this.m_socketAddressesToIo.size() < 10)
+            {
+            LOG.warn("Existing connections: "+
+                this.m_socketAddressesToIo);
+            final StringBuffer sb = new StringBuffer();
+            final Collection keys = 
+                this.m_socketAddressesToIo.keySet();
+            for (final Iterator iter = keys.iterator(); iter.hasNext();)
+                {
+                final InetSocketAddress sa = 
+                    (InetSocketAddress) iter.next();
+                sb.append(sa.toString());
+                sb.append(" code: ");
+                sb.append(sa.hashCode());
+                sb.append(", ");
+                }
+            LOG.warn("hashCode()s: "+sb.toString());
             }
         }
     }

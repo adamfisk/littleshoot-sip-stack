@@ -61,12 +61,11 @@ abstract class SipFirstLineDecodingState extends DecodingStateMachine
             final ProtocolDecoderOutput out) throws Exception
             {
             final String firstWord = product.getString(m_asciiDecoder);
-            
+
             final SipMessageType messageType;
             if (!SipMessageType.contains(firstWord))
                 {
-                // Preserve the unknown message type.
-                out.write(firstWord);
+                LOG.warn("Unknown message type: '{}'", firstWord);
                 messageType = SipMessageType.UNKNOWN;
                 }
             
@@ -84,6 +83,11 @@ abstract class SipFirstLineDecodingState extends DecodingStateMachine
                 case REGISTER:
                     return new ReadRequestUriState();
                 case INVITE:
+                    return new ReadRequestUriState();
+                case UNKNOWN:
+                    // Maybe it's a method we don't know about?  Process it
+                    // as a request and write out the word.
+                    out.write(firstWord);
                     return new ReadRequestUriState();
                 default:
                     return new ReadRequestUriState();
