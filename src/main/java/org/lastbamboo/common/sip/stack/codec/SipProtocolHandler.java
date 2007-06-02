@@ -12,16 +12,26 @@ import org.lastbamboo.common.sip.stack.message.SipMessageVisitorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Protocol handler for SIP messages.
+ */
 public class SipProtocolHandler implements IoHandler
     {
 
-    private static final Logger LOG = 
+    private final Logger LOG = 
         LoggerFactory.getLogger(SipProtocolHandler.class);
     
     private final SipMessageVisitorFactory m_visitorFactory;
 
     private static int s_messagesRead = 0;
     
+    /**
+     * Creates a new protocol handler.
+     * 
+     * @param visitorFactory The factory for creating visitors for read 
+     * messages.  Factories might create specialized visitors for clients or
+     * servers, for example.
+     */
     public SipProtocolHandler(final SipMessageVisitorFactory visitorFactory)
         {
         m_visitorFactory = visitorFactory;
@@ -48,8 +58,6 @@ public class SipProtocolHandler implements IoHandler
         final SipMessage sipMessage = (SipMessage) message;
         final SipMessageVisitor visitor = 
             this.m_visitorFactory.createVisitor(session);
-        //final HttpMessageVisitor httpVisitor = 
-          //  new HttpToSipMessageConverter(visitor, this.m_messageFactory);
         sipMessage.accept(visitor);
         }
     
