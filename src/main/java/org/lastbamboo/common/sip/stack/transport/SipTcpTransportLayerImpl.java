@@ -295,7 +295,7 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
             }
         }
     
-    private void writeDebugData(InetSocketAddress socketAddress)
+    private void writeDebugData(final InetSocketAddress socketAddress)
         {
         LOG.warn("No connection for socket address: "+socketAddress);
         LOG.warn("hashCode(): "+socketAddress.hashCode());
@@ -308,8 +308,7 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
                 this.m_socketAddressesToIo.keySet();
             for (final Iterator iter = keys.iterator(); iter.hasNext();)
                 {
-                final InetSocketAddress sa = 
-                    (InetSocketAddress) iter.next();
+                final InetSocketAddress sa = (InetSocketAddress) iter.next();
                 sb.append(sa.toString());
                 sb.append(" code: ");
                 sb.append(sa.hashCode());

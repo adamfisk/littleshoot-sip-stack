@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class DecodingStateMachine implements DecodingState 
     {
-    private final Logger m_log = 
+    private final Logger LOG = 
         LoggerFactory.getLogger(DecodingStateMachine.class);
 
     private final List<Object> m_childProducts = new ArrayList<Object>();
@@ -59,6 +59,7 @@ public abstract class DecodingStateMachine implements DecodingState
                 // Wait for more data if all data is consumed.
                 if (pos == limit)
                     {
+                    LOG.debug("Position at limit, breaking...");
                     break;
                     }
 
@@ -68,14 +69,14 @@ public abstract class DecodingStateMachine implements DecodingState
                 // If finished, call finishDecode
                 if (state == null)
                     {
-                    if (m_log.isDebugEnabled())
+                    if (LOG.isDebugEnabled())
                         {
                         debugStateTransition(oldState);
                         }
                     final DecodingState returningState = 
                         finishDecode(m_childProducts, out); 
                     
-                    if (m_log.isDebugEnabled())
+                    if (LOG.isDebugEnabled())
                         {
                         debugStateTransition2(returningState, in);
                         }
@@ -89,7 +90,7 @@ public abstract class DecodingStateMachine implements DecodingState
                 // change.
                 if (newPos == pos && oldState == state)
                     {
-                    m_log.debug("No data consumed and no state change...returning");
+                    LOG.debug("No data consumed and no state change...returning");
                     break;
                     }
                 pos = newPos;
@@ -97,9 +98,9 @@ public abstract class DecodingStateMachine implements DecodingState
 
             return this;
             }
-        catch (Exception e)
+        catch (final Exception e)
             {
-            m_log.warn("Caught exception!!", e);
+            LOG.warn("Caught exception!!", e);
             state = null;
             throw e;
             }
@@ -117,7 +118,7 @@ public abstract class DecodingStateMachine implements DecodingState
                     }
                 catch (Exception e2)
                     {
-                    m_log.warn("Failed to destroy a decoding state machine.", e2);
+                    LOG.warn("Failed to destroy a decoding state machine.", e2);
                     }
                 }
             }
@@ -125,9 +126,9 @@ public abstract class DecodingStateMachine implements DecodingState
 
     private void debugStateTransition(DecodingState oldState)
         {
-        m_log.debug("This state: {}", ClassUtils.getShortClassName(getClass()));
-        m_log.debug("Got null from "+ClassUtils.getShortClassName(oldState.getClass()));
-        m_log.debug("Finishing decode for state: {}", 
+        LOG.debug("This state: {}", ClassUtils.getShortClassName(getClass()));
+        LOG.debug("Got null from "+ClassUtils.getShortClassName(oldState.getClass()));
+        LOG.debug("Finishing decode for state: {}", 
             ClassUtils.getShortClassName(getClass()));
         }
     
@@ -144,9 +145,9 @@ public abstract class DecodingStateMachine implements DecodingState
             {
             stateString = null;
             }
-        m_log.debug(ClassUtils.getShortClassName(getClass()) + 
+        LOG.debug(ClassUtils.getShortClassName(getClass()) + 
             " transitioning to state: {}", stateString);
         
-        m_log.debug("Remaining bytes: "+in.remaining());
+        LOG.debug("Remaining bytes: "+in.remaining());
         }
     }

@@ -51,7 +51,6 @@ abstract class SipHeaderDecodingState extends DecodingStateMachine
     @Override
     protected DecodingState init() throws Exception
         {
-        //return new SingleHeaderDecodingState();
         return new HeaderNameDecodingState();
         }
 
