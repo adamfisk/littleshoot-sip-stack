@@ -28,6 +28,7 @@ public class SipTransactionTrackerImpl implements SipTransactionTracker,
         final SipMessage message = ct.getRequest();
         final String key = getTransactionKey(message);
         this.m_transactions.put(key, ct);
+        ct.addListener(this);
         }
 
     public SipClientTransaction getClientTransaction(final SipMessage message)

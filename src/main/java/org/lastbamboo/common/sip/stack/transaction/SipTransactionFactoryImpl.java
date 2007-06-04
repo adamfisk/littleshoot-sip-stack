@@ -39,9 +39,10 @@ public class SipTransactionFactoryImpl implements SipTransactionFactory
     public SipClientTransaction createClientTransaction(
         final SipMessage request, final SipTransactionListener listener)
         {
-        final List transactionListeners = new LinkedList();
+        final List<SipTransactionListener> transactionListeners = 
+            new LinkedList<SipTransactionListener>();
         transactionListeners.add(listener);
-        transactionListeners.add(this.m_transactionTracker);
+        
         final SipClientTransaction ct = 
             new SipClientTransactionImpl(request, transactionListeners, 
                 this.m_messageFactory, this.m_timerBThread, this.m_t1);

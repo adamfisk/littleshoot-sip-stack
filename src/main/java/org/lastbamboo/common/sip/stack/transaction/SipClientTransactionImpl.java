@@ -1,6 +1,5 @@
 package org.lastbamboo.common.sip.stack.transaction;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -29,7 +28,7 @@ public class SipClientTransactionImpl implements SipClientTransaction
 
     private long m_transactionTime = Long.MAX_VALUE;
 
-    private final List m_transactionListeners;
+    private final List<SipTransactionListener> m_transactionListeners;
 
     private final long m_transactionStartTime;
 
@@ -55,7 +54,8 @@ public class SipClientTransactionImpl implements SipClientTransaction
      * modified for testing, for example.
      */
     public SipClientTransactionImpl(final SipMessage request, 
-        final List transactionListeners, final SipMessageFactory messageFactory,
+        final List<SipTransactionListener> transactionListeners, 
+        final SipMessageFactory messageFactory,
         final Timer timer, final int t1)
         {
         this.m_request = request;
@@ -79,6 +79,11 @@ public class SipClientTransactionImpl implements SipClientTransaction
             };
             
         timer.schedule(this.m_timerB, 64 * t1);
+        }
+    
+    public void addListener(final SipTransactionListener listener)
+        {
+        this.m_transactionListeners.add(listener);
         }
 
     public SipMessage getRequest()
@@ -108,11 +113,9 @@ public class SipClientTransactionImpl implements SipClientTransaction
                 {
                 LOG.debug("Transaction time: "+getTransactionTime());
                 }
-            for (final Iterator iter = this.m_transactionListeners.iterator(); 
-                iter.hasNext();)
+            for (final SipTransactionListener listener : 
+                this.m_transactionListeners)
                 {
-                final SipTransactionListener listener = 
-                    (SipTransactionListener) iter.next();
                 listener.onTransactionSucceeded(response);
                 }
             }
@@ -138,11 +141,9 @@ public class SipClientTransactionImpl implements SipClientTransaction
     private void notifyListenersOfFailure(final SipMessage response)
         {
         setTransactionTime();
-        for (final Iterator iter = this.m_transactionListeners.iterator(); 
-            iter.hasNext();)
+        for (final SipTransactionListener listener : 
+            this.m_transactionListeners)
             {
-            final SipTransactionListener listener = 
-                (SipTransactionListener) iter.next();
             listener.onTransactionFailed(response);
             }
         }

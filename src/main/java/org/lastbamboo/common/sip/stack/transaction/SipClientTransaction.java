@@ -23,4 +23,13 @@ public interface SipClientTransaction extends SipMessageVisitor
      */
     long getTransactionTime();
 
+    /**
+     * Adds a listener to the transaction.  This should typically be called 
+     * before any message has been sent -- before the transaction has started 
+     * -- to ensure events aren't missed.
+     * 
+     * @param listener The listener to add.
+     */
+    void addListener(SipTransactionListener listener);
+
     }
