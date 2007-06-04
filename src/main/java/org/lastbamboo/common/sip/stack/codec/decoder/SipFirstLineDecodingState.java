@@ -31,6 +31,12 @@ import org.slf4j.LoggerFactory;
  * <pre>
  * Status-Line  =  SIP-Version SP Status-Code SP Reason-Phrase CRLF
  * </pre>
+ * 
+ * <p>
+ * This also decodes the SIP double CRLF keep-alive message, which is simply:
+ * <pre>
+ * CRLFCRLF
+ * </pre>
  */
 abstract class SipFirstLineDecodingState extends DecodingStateMachine 
     {
