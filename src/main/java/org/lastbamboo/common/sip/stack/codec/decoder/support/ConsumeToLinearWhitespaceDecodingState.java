@@ -1,6 +1,7 @@
 package org.lastbamboo.common.sip.stack.codec.decoder.support;
 
 import org.apache.mina.common.ByteBuffer;
+import org.lastbamboo.common.sip.stack.codec.SipCodecUtils;
 
 
 /**
@@ -9,13 +10,15 @@ import org.apache.mina.common.ByteBuffer;
  * Taken from the AsyncWeb project.  
  */
 public abstract class ConsumeToLinearWhitespaceDecodingState extends
-    ConsumeToDynamicTerminatorDecodingState
+    ConsumeToTerminatorDecodingState
     {
 
-    @Override
-    protected boolean isTerminator(final byte b)
+    /**
+     * Creates a new LWS decoding state.  This only checks for a single space
+     * because that's what SIP typically requires.
+     */
+    public ConsumeToLinearWhitespaceDecodingState()
         {
-        // Skip spaces and tabs.
-        return (b == 32 || b == 9);
+        super(SipCodecUtils.SP);
         }
     }

@@ -1,15 +1,18 @@
 package org.lastbamboo.common.sip.stack.codec.decoder;
 
 import java.net.URI;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
+import org.lastbamboo.common.sip.stack.codec.SipCodecUtils;
 import org.lastbamboo.common.sip.stack.codec.SipMessageType;
 import org.lastbamboo.common.sip.stack.codec.decoder.support.ConsumeToCrlfDecodingState;
 import org.lastbamboo.common.sip.stack.codec.decoder.support.ConsumeToLinearWhitespaceDecodingState;
+import org.lastbamboo.common.sip.stack.codec.decoder.support.ConsumeToTerminatorDecodingState;
 import org.lastbamboo.common.sip.stack.codec.decoder.support.DecodingState;
 import org.lastbamboo.common.sip.stack.codec.decoder.support.DecodingStateMachine;
 import org.slf4j.Logger;
@@ -45,7 +48,7 @@ abstract class SipFirstLineDecodingState extends DecodingStateMachine
     @Override
     protected DecodingState init() throws Exception
         {
-        return new ReadFirstWord();
+        return new MessageTypeDecodingState();
         }
 
     @Override
@@ -53,27 +56,23 @@ abstract class SipFirstLineDecodingState extends DecodingStateMachine
         {
         }
     
-    private final class ReadFirstWord 
-        extends ConsumeToLinearWhitespaceDecodingState
+    private final class MessageTypeDecodingState 
+        extends ConsumeToTerminatorDecodingState
         {
-        @Override
-        protected DecodingState finishDecode(final ByteBuffer product,
-            final ProtocolDecoderOutput out) throws Exception
+        
+        private MessageTypeDecodingState()
             {
-            final String firstWord = product.getString(m_asciiDecoder);
+            super(SipCodecUtils.SP, SipCodecUtils.CR);
+            }
 
-            final SipMessageType messageType;
-            if (!SipMessageType.contains(firstWord))
-                {
-                LOG.warn("Unknown message type: '{}'", firstWord);
-                messageType = SipMessageType.UNKNOWN;
-                }
-            
-            else
-                {
-                messageType = SipMessageType.convert(firstWord);              
-                }
-            
+        @Override
+        protected DecodingState finishDecode(final byte terminator, 
+            final ByteBuffer product, final ProtocolDecoderOutput out) 
+            throws Exception
+            {
+            final SipMessageType messageType = 
+                determineMessageType(terminator, product, out);
+                
             out.write(messageType);
             
             switch (messageType)
@@ -84,23 +83,63 @@ abstract class SipFirstLineDecodingState extends DecodingStateMachine
                     return new ReadRequestUriState();
                 case INVITE:
                     return new ReadRequestUriState();
+                case DOUBLE_CRLF:
+                    return new ReadCrCrlfDecodingState();
                 case UNKNOWN:
-                    // Maybe it's a method we don't know about?  Process it
-                    // as a request and write out the word.
-                    out.write(firstWord);
+                    // Maybe it's a method we don't know about?  Assume it's
+                    // some sort of request and process it as such.
                     return new ReadRequestUriState();
                 default:
                     return new ReadRequestUriState();
                 }
             }
-        }
+
+        private SipMessageType determineMessageType(final byte terminator, 
+            final ByteBuffer product, final ProtocolDecoderOutput out) 
+            throws CharacterCodingException
+            {
+            if (terminator == SipCodecUtils.CR)
+                {
+                return SipMessageType.DOUBLE_CRLF;
+                }
+            else
+                {
+                final String firstWord = product.getString(m_asciiDecoder);
+
+                if (!SipMessageType.contains(firstWord))
+                    {
+                    LOG.warn("Unknown message type: '{}'", firstWord);
+                    out.write(firstWord);
+                    return SipMessageType.UNKNOWN;
+                    }
+                
+                else
+                    {
+                    return SipMessageType.convert(firstWord);              
+                    }
+                }
+            }
+        };
+    
+    private final class ReadCrCrlfDecodingState 
+        extends ConsumeToCrlfDecodingState
+        {
+        @Override
+        protected DecodingState finishDecode(final ByteBuffer product,
+            final ProtocolDecoderOutput out) throws Exception
+            {
+            // Read the final CRCRLF sequence of a CRLFCRLF keep-alive message.
+            return null;
+            }
+        };
     
     private final class ReadRequestUriState 
         extends ConsumeToLinearWhitespaceDecodingState
         {
         @Override
-        protected DecodingState finishDecode(final ByteBuffer product,
-            final ProtocolDecoderOutput out) throws Exception
+        protected DecodingState finishDecode(final byte foundTerminator,
+            final ByteBuffer product, final ProtocolDecoderOutput out) 
+            throws Exception
             {
             final String uri = product.getString(m_utf8Decoder);
             out.write(new URI(uri));
@@ -126,8 +165,9 @@ abstract class SipFirstLineDecodingState extends DecodingStateMachine
         {
 
         @Override
-        protected DecodingState finishDecode(final ByteBuffer product, 
-            final ProtocolDecoderOutput out) throws Exception
+        protected DecodingState finishDecode(final byte foundTerminator,
+            final ByteBuffer product, final ProtocolDecoderOutput out) 
+            throws Exception
             {
             final String statusCodeString = product.getString(m_asciiDecoder);
             if (!NumberUtils.isNumber(statusCodeString))

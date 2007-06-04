@@ -32,7 +32,11 @@ public abstract class ConsumeToTerminatorDecodingState implements DecodingState
     
     private ByteBuffer buffer;
 
-    private final byte m_terminator;
+    private final byte m_terminator1;
+
+    private final byte m_terminator2;
+
+    private byte m_foundTerminator;
 
     /**
      * Creates a new instance.
@@ -41,7 +45,20 @@ public abstract class ConsumeToTerminatorDecodingState implements DecodingState
      */
     protected ConsumeToTerminatorDecodingState(final byte terminator)
         {
-        m_terminator = terminator;
+        m_terminator1 = terminator;
+        m_terminator2 = -1;
+        }
+    
+    /**
+     * Creates a new instance.
+     * 
+     * @param terminator The terminator.
+     */
+    protected ConsumeToTerminatorDecodingState(final byte terminator1,
+        final byte terminator2)
+        {
+        m_terminator1 = terminator1;
+        m_terminator2 = terminator2;
         }
 
     public DecodingState decode(final ByteBuffer in, 
@@ -54,8 +71,9 @@ public abstract class ConsumeToTerminatorDecodingState implements DecodingState
         for (int i = beginPos; i < limit; i++)
             {
             byte b = in.get(i);
-            if (b == this.m_terminator)
+            if (b == this.m_terminator1 || b == this.m_terminator2)
                 {
+                this.m_foundTerminator = b;
                 terminatorPos = i;
                 break;
                 }
@@ -99,7 +117,7 @@ public abstract class ConsumeToTerminatorDecodingState implements DecodingState
                 }
             
             in.position(terminatorPos + 1);
-            return finishDecode(product, out);
+            return finishDecode(this.m_foundTerminator, product, out);
             }
         else
             {
@@ -113,6 +131,6 @@ public abstract class ConsumeToTerminatorDecodingState implements DecodingState
             }
         }
 
-    protected abstract DecodingState finishDecode(ByteBuffer product,
-            ProtocolDecoderOutput out) throws Exception;
+    protected abstract DecodingState finishDecode(byte foundTerminator,
+        ByteBuffer product, ProtocolDecoderOutput out) throws Exception;
     }

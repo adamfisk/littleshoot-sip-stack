@@ -69,8 +69,9 @@ abstract class SipHeaderDecodingState extends DecodingStateMachine
             }
 
         @Override
-        protected DecodingState finishDecode(final ByteBuffer product, 
-            final ProtocolDecoderOutput out) throws Exception
+        protected DecodingState finishDecode(final byte foundTerminator,
+            final ByteBuffer product, final ProtocolDecoderOutput out) 
+            throws Exception
             {
             final String headerName = product.getString(m_asciiDecoder);
             return new AfterHeaderColonState(headerName);

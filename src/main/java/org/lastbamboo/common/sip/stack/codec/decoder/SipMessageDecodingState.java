@@ -10,6 +10,7 @@ import org.lastbamboo.common.sip.stack.codec.SipMessageType;
 import org.lastbamboo.common.sip.stack.codec.decoder.support.DecodingState;
 import org.lastbamboo.common.sip.stack.codec.decoder.support.DecodingStateMachine;
 import org.lastbamboo.common.sip.stack.codec.decoder.support.FixedLengthDecodingState;
+import org.lastbamboo.common.sip.stack.message.DoubleCrlfKeepAlive;
 import org.lastbamboo.common.sip.stack.message.SingleSipMessageFactory;
 import org.lastbamboo.common.sip.stack.message.SipInviteFactory;
 import org.lastbamboo.common.sip.stack.message.SipMessage;
@@ -91,6 +92,12 @@ public abstract class SipMessageDecodingState extends DecodingStateMachine
                     final URI inviteUri = (URI) childProducts.get(1);
                     m_messageFactory = new SipInviteFactory(inviteUri);
                     break;
+                case DOUBLE_CRLF:
+                    // Just create the double CRLF keep alive here and write
+                    // it out to be visited.
+                    final SipMessage doubleCrlf = new DoubleCrlfKeepAlive();
+                    out.write(doubleCrlf);
+                    return new ReadFirstLineState();
                 case UNKNOWN:
                     final String method = (String) childProducts.get(1);
                     final URI uri = (URI) childProducts.get(2);

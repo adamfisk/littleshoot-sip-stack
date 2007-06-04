@@ -110,8 +110,14 @@ public class SipCodecUtils
     /**
      * Bytes making up a <code>CR LF</code>
      */
-    private static final byte[] CRLF_BYTES = new byte[]
+    public static final byte[] CRLF_BYTES = new byte[]
         { CR, LF };
+    
+    /**
+     * Bytes making up a <code>CR LF CR LF</code>
+     */
+    public static final byte[] DOUBLE_CRLF_BYTES = new byte[]
+        { CR, LF, CR, LF };
 
     private static final String US_ASCII_CHARSET_NAME = "US-ASCII";
 

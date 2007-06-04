@@ -23,7 +23,12 @@ public enum SipMessageType implements EnumConverter<String>
     /**
      * SIP/2.0 version string.
      */
-    SIP_2_0("SIP/2.0"), 
+    SIP_2_0("SIP/2.0"),
+    
+    /**
+     * The double CRLF keep-alive message from SIP outbound.
+     */
+    DOUBLE_CRLF("\r\n\r\n"),
     
     /**
      * Unknown message type.
