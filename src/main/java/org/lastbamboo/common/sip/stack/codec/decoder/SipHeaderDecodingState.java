@@ -7,15 +7,15 @@ import java.util.TreeMap;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
-import org.lastbamboo.common.sip.stack.codec.SipCodecUtils;
-import org.lastbamboo.common.sip.stack.codec.decoder.support.ConsumeToCrlfDecodingState;
-import org.lastbamboo.common.sip.stack.codec.decoder.support.ConsumeToTerminatorDecodingState;
-import org.lastbamboo.common.sip.stack.codec.decoder.support.CrlfDecodingState;
-import org.lastbamboo.common.sip.stack.codec.decoder.support.DecodingState;
-import org.lastbamboo.common.sip.stack.codec.decoder.support.DecodingStateMachine;
-import org.lastbamboo.common.sip.stack.codec.decoder.support.SpaceSkippingState;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
+import org.lastbamboo.common.util.mina.ConsumeToCrlfDecodingState;
+import org.lastbamboo.common.util.mina.ConsumeToTerminatorDecodingState;
+import org.lastbamboo.common.util.mina.CrlfDecodingState;
+import org.lastbamboo.common.util.mina.DecodingState;
+import org.lastbamboo.common.util.mina.DecodingStateMachine;
+import org.lastbamboo.common.util.mina.MinaCodecUtils;
+import org.lastbamboo.common.util.mina.SpaceSkippingState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +65,7 @@ abstract class SipHeaderDecodingState extends DecodingStateMachine
 
         private HeaderNameDecodingState()
             {
-            super(SipCodecUtils.COLON);
+            super(MinaCodecUtils.COLON);
             }
 
         @Override

@@ -7,10 +7,10 @@ import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.lastbamboo.common.sip.stack.codec.decoder.SipMessageDecodingState;
-import org.lastbamboo.common.sip.stack.codec.decoder.support.DecodingState;
-import org.lastbamboo.common.sip.stack.codec.decoder.support.StateMachineProtocolDecoder;
 import org.lastbamboo.common.sip.stack.codec.encoder.SipMessageProtocolEncoder;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
+import org.lastbamboo.common.util.mina.DecodingState;
+import org.lastbamboo.common.util.mina.StateMachineProtocolDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

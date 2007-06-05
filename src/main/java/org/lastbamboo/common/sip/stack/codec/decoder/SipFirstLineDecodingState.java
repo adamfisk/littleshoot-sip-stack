@@ -8,13 +8,13 @@ import java.nio.charset.CharsetDecoder;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
-import org.lastbamboo.common.sip.stack.codec.SipCodecUtils;
 import org.lastbamboo.common.sip.stack.codec.SipMessageType;
-import org.lastbamboo.common.sip.stack.codec.decoder.support.ConsumeToCrlfDecodingState;
-import org.lastbamboo.common.sip.stack.codec.decoder.support.ConsumeToLinearWhitespaceDecodingState;
-import org.lastbamboo.common.sip.stack.codec.decoder.support.ConsumeToTerminatorDecodingState;
-import org.lastbamboo.common.sip.stack.codec.decoder.support.DecodingState;
-import org.lastbamboo.common.sip.stack.codec.decoder.support.DecodingStateMachine;
+import org.lastbamboo.common.util.mina.ConsumeToCrlfDecodingState;
+import org.lastbamboo.common.util.mina.ConsumeToLinearWhitespaceDecodingState;
+import org.lastbamboo.common.util.mina.ConsumeToTerminatorDecodingState;
+import org.lastbamboo.common.util.mina.DecodingState;
+import org.lastbamboo.common.util.mina.DecodingStateMachine;
+import org.lastbamboo.common.util.mina.MinaCodecUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +68,7 @@ abstract class SipFirstLineDecodingState extends DecodingStateMachine
         
         private MessageTypeDecodingState()
             {
-            super(SipCodecUtils.SP, SipCodecUtils.CR);
+            super(MinaCodecUtils.SP, MinaCodecUtils.CR);
             }
 
         @Override
@@ -104,7 +104,7 @@ abstract class SipFirstLineDecodingState extends DecodingStateMachine
             final ByteBuffer product, final ProtocolDecoderOutput out) 
             throws CharacterCodingException
             {
-            if (terminator == SipCodecUtils.CR)
+            if (terminator == MinaCodecUtils.CR)
                 {
                 return SipMessageType.DOUBLE_CRLF;
                 }

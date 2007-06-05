@@ -9,10 +9,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.mina.common.ByteBuffer;
-import org.lastbamboo.common.sip.stack.codec.SipCodecUtils;
 import org.lastbamboo.common.sip.stack.message.SipMessage;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderValue;
+import org.lastbamboo.common.util.mina.MinaCodecUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +55,7 @@ public class SipMessageEncoderImpl implements SipMessageEncoder
             {
             LOG.error("Bad encoding?", e);
             }
-        SipCodecUtils.appendCRLF(buffer);
+        MinaCodecUtils.appendCRLF(buffer);
         }
 
     private void encodeHeaders(final SipMessage message, 
@@ -69,17 +69,17 @@ public class SipMessageEncoderImpl implements SipMessageEncoder
             try
                 {
                 buffer.putString(header.getName(), m_asciiEncoder);
-                buffer.put(SipCodecUtils.COLON);
-                buffer.put(SipCodecUtils.SP);
+                buffer.put(MinaCodecUtils.COLON);
+                buffer.put(MinaCodecUtils.SP);
                 appendHeaderValues(buffer, values);
-                SipCodecUtils.appendCRLF(buffer);
+                MinaCodecUtils.appendCRLF(buffer);
                 }
             catch (final CharacterCodingException e)
                 {
                 LOG.error("Bad encoding?", e);
                 }
             }
-        SipCodecUtils.appendCRLF(buffer);
+        MinaCodecUtils.appendCRLF(buffer);
         }
 
     private void appendHeaderValues(final ByteBuffer buffer,
@@ -94,14 +94,14 @@ public class SipMessageEncoderImpl implements SipMessageEncoder
             final Set<Map.Entry<String, String>> entries = params.entrySet();
             for (final Map.Entry<String, String> entry : entries)
                 {
-                buffer.put(SipCodecUtils.SEMI_COLON);
+                buffer.put(MinaCodecUtils.SEMI_COLON);
                 buffer.putString(entry.getKey(), m_asciiEncoder);
-                buffer.put(SipCodecUtils.EQUALS);
+                buffer.put(MinaCodecUtils.EQUALS);
                 buffer.putString(entry.getValue(), m_asciiEncoder);
                 }
             if (iter.hasNext())
                 {
-                buffer.put(SipCodecUtils.COMMA);
+                buffer.put(MinaCodecUtils.COMMA);
                 }
             }
         }
