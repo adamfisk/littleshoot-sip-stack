@@ -34,24 +34,6 @@ public abstract class AbstractSipMessage implements SipMessage
     
     private static final ByteBuffer EMPTY_BODY = ByteBuffer.allocate(0);
     
-    //private final ByteBuffer m_messageBytes;
-
-    /**
-     * Creates a new SIP message with the specified first line of the message
-     * and the specified headers.  This constructor creates a message with
-     * no message body.
-     * 
-     * @param startLine The first line of the message.
-     * @param headers The message headers.
-     */
-    /*
-    public AbstractSipMessage(final String startLine, 
-        final Map<String, SipHeader> headers)
-        {
-        this(startLine, headers, EMPTY_BODY);
-        }
-        */
-    
     /**
      * Creates a new SIP message with the specified first line of the message,
      * the specified headers, and the specified message body.
@@ -157,13 +139,6 @@ public abstract class AbstractSipMessage implements SipMessage
         {
         return this.m_messageBody;
         }
-    
-    /*
-    public int getTotalLength() 
-        {
-        return getBytes().capacity();
-        }
-        */
     
     public final String getBranchId()
         {
