@@ -1,4 +1,4 @@
-package org.lastbamboo.common.sip.stack.transaction;
+package org.lastbamboo.common.sip.stack.transaction.client;
 
 import org.lastbamboo.common.sip.stack.message.SipMessage;
 import org.lastbamboo.common.sip.stack.message.SipMessageVisitor;

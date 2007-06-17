@@ -26,9 +26,9 @@ import org.lastbamboo.common.sip.stack.message.SipMessageUtils;
 import org.lastbamboo.common.sip.stack.message.SipResponse;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
-import org.lastbamboo.common.sip.stack.transaction.SipClientTransaction;
-import org.lastbamboo.common.sip.stack.transaction.SipTransactionFactory;
-import org.lastbamboo.common.sip.stack.transaction.SipTransactionListener;
+import org.lastbamboo.common.sip.stack.transaction.client.SipClientTransaction;
+import org.lastbamboo.common.sip.stack.transaction.client.SipTransactionFactory;
+import org.lastbamboo.common.sip.stack.transaction.client.SipTransactionListener;
 import org.lastbamboo.common.util.NetworkUtils;
 
 /**

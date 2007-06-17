@@ -8,8 +8,8 @@ import org.apache.mina.common.IoSession;
 import org.lastbamboo.common.sip.stack.message.Invite;
 import org.lastbamboo.common.sip.stack.message.Register;
 import org.lastbamboo.common.sip.stack.message.SipResponse;
-import org.lastbamboo.common.sip.stack.transaction.SipClientTransaction;
-import org.lastbamboo.common.sip.stack.transaction.SipTransactionListener;
+import org.lastbamboo.common.sip.stack.transaction.client.SipClientTransaction;
+import org.lastbamboo.common.sip.stack.transaction.client.SipTransactionListener;
 
 /**
  * Interface for calls to the TCP transport layer, as specified in section

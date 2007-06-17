@@ -1,4 +1,4 @@
-package org.lastbamboo.common.sip.stack.transaction;
+package org.lastbamboo.common.sip.stack.transaction.client;
 
 import java.util.LinkedList;
 import java.util.List;

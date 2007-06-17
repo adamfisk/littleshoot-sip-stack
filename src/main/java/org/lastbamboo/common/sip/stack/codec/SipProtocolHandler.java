@@ -83,8 +83,7 @@ public class SipProtocolHandler implements IoHandler
     public void sessionIdle(final IoSession session, final IdleStatus idle) 
         throws Exception
         {
-        // TODO Auto-generated method stub
-        
+        // TODO: This is where we should be sending the CRLF keep alives.
         }
 
     public void sessionOpened(final IoSession session) throws Exception

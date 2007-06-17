@@ -4,6 +4,12 @@
 <beans>
 
     <!--
+        A factory for creating SIP URIs from user identifiers.
+    -->
+    <bean id="sipUriFactory"
+          class="org.lastbamboo.common.sip.stack.SipUriFactoryImpl"/>
+          
+    <!--
         URI utilities.
     -->
     <bean id="uriUtils" class="org.lastbamboo.common.sip.stack.util.UriUtilsImpl">
@@ -28,14 +34,14 @@
         The factory for creating SIP transactions.
     -->
     <bean id="sipTransactionTracker"
-          class="org.lastbamboo.common.sip.stack.transaction.SipTransactionTrackerImpl">
+          class="org.lastbamboo.common.sip.stack.transaction.client.SipTransactionTrackerImpl">
         </bean>
 
     <!--
         The factory for creating SIP transactions.
     -->
     <bean id="sipTransactionFactory"
-          class="org.lastbamboo.common.sip.stack.transaction.SipTransactionFactoryImpl">
+          class="org.lastbamboo.common.sip.stack.transaction.client.SipTransactionFactoryImpl">
     	<constructor-arg><ref local="sipTransactionTracker"/></constructor-arg>
        	<constructor-arg><ref local="sipMessageFactory"/></constructor-arg>
        	<constructor-arg><value>500</value></constructor-arg>

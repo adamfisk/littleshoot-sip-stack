@@ -12,10 +12,10 @@ import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactoryImpl;
 import org.lastbamboo.common.sip.stack.stubs.IoSessionStub;
 import org.lastbamboo.common.sip.stack.stubs.SipResponseStub;
-import org.lastbamboo.common.sip.stack.transaction.SipTransactionFactory;
-import org.lastbamboo.common.sip.stack.transaction.SipTransactionFactoryImpl;
-import org.lastbamboo.common.sip.stack.transaction.SipTransactionTracker;
-import org.lastbamboo.common.sip.stack.transaction.SipTransactionTrackerImpl;
+import org.lastbamboo.common.sip.stack.transaction.client.SipTransactionFactory;
+import org.lastbamboo.common.sip.stack.transaction.client.SipTransactionFactoryImpl;
+import org.lastbamboo.common.sip.stack.transaction.client.SipTransactionTracker;
+import org.lastbamboo.common.sip.stack.transaction.client.SipTransactionTrackerImpl;
 
 /**
  * Test for the TCP transport layer.
