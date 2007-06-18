@@ -15,11 +15,11 @@ import org.slf4j.LoggerFactory;
 /**
  * Protocol handler for SIP messages.
  */
-public class SipProtocolHandler implements IoHandler
+public class SipIoHandler implements IoHandler
     {
 
     private final Logger LOG = 
-        LoggerFactory.getLogger(SipProtocolHandler.class);
+        LoggerFactory.getLogger(SipIoHandler.class);
     
     private final SipMessageVisitorFactory m_visitorFactory;
 
@@ -32,7 +32,7 @@ public class SipProtocolHandler implements IoHandler
      * messages.  Factories might create specialized visitors for clients or
      * servers, for example.
      */
-    public SipProtocolHandler(final SipMessageVisitorFactory visitorFactory)
+    public SipIoHandler(final SipMessageVisitorFactory visitorFactory)
         {
         m_visitorFactory = visitorFactory;
         }
