@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
-import org.apache.mina.util.SessionLog;
 import org.lastbamboo.common.sip.stack.message.SipMessage;
 import org.lastbamboo.common.sip.stack.message.SipMessageVisitor;
 import org.lastbamboo.common.sip.stack.message.SipMessageVisitorFactory;
@@ -42,18 +41,18 @@ public class SipIoHandler implements IoHandler
         {
         if (!(cause instanceof IOException)) 
             {
-            SessionLog.warn(session, "Unexpected exception:", cause);
+            LOG.warn("Unexpected exception:", cause);
             }
           session.close();
         }
 
-    public void messageReceived(final IoSession session, final Object message) 
-        throws Exception
+    public final void messageReceived(final IoSession session, 
+        final Object message) throws Exception
         {
         s_messagesRead++;
         if (LOG.isDebugEnabled())
             {
-            LOG.debug("Now read "+s_messagesRead+" messages...");
+            LOG.debug("Messages read:{} ", s_messagesRead);
             }
         final SipMessage sipMessage = (SipMessage) message;
         final SipMessageVisitor visitor = 
@@ -64,32 +63,23 @@ public class SipIoHandler implements IoHandler
     public void messageSent(final IoSession session, final Object message) 
         throws Exception
         {
-        // TODO Auto-generated method stub
-        
         }
 
     public void sessionClosed(final IoSession session) throws Exception
         {
-        // TODO Auto-generated method stub
-        
         }
 
     public void sessionCreated(final IoSession session) throws Exception
         {
-        // TODO Auto-generated method stub
-        
         }
 
     public void sessionIdle(final IoSession session, final IdleStatus idle) 
         throws Exception
         {
-        // TODO: This is where we should be sending the CRLF keep alives.
         }
 
     public void sessionOpened(final IoSession session) throws Exception
         {
-        // TODO Auto-generated method stub
-        
         }
 
     }
