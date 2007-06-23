@@ -17,11 +17,11 @@ import org.slf4j.LoggerFactory;
 /**
  * Codec factory for processing SIP server messages.
  */
-public class SipCodecFactory implements ProtocolCodecFactory
+public class SipProtocolCodecFactory implements ProtocolCodecFactory
     {
 
     private final Logger LOG = 
-        LoggerFactory.getLogger(SipCodecFactory.class);
+        LoggerFactory.getLogger(SipProtocolCodecFactory.class);
     private final SipHeaderFactory m_headerFactory;
     
     private static int s_readMessages = 0;
@@ -31,7 +31,7 @@ public class SipCodecFactory implements ProtocolCodecFactory
      * 
      * @param headerFactory The factory for creating SIP headers.
      */
-    public SipCodecFactory(final SipHeaderFactory headerFactory)
+    public SipProtocolCodecFactory(final SipHeaderFactory headerFactory)
         {
         m_headerFactory = headerFactory;
         }
@@ -42,6 +42,11 @@ public class SipCodecFactory implements ProtocolCodecFactory
             new TopLevelSipMessageDecodingState(m_headerFactory);
 
         return new StateMachineProtocolDecoder(startState);
+        }
+    
+    public ProtocolEncoder getEncoder() throws Exception
+        {
+        return new SipMessageProtocolEncoder();
         }
     
     private final class TopLevelSipMessageDecodingState 
@@ -72,8 +77,4 @@ public class SipCodecFactory implements ProtocolCodecFactory
     
         }
 
-    public ProtocolEncoder getEncoder() throws Exception
-        {
-        return new SipMessageProtocolEncoder();
-        }
     }
