@@ -1,14 +1,15 @@
 package org.lastbamboo.common.sip.stack.codec;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
-import org.lastbamboo.common.util.EnumConverter;
-import org.lastbamboo.common.util.ReverseEnumMap;
 
 /**
  * Enumeration of first words in SIP messages.  Most are request types, while
  * the SIP version indicates a response.
  */
-public enum SipMessageType implements EnumConverter<String>
+public enum SipMessageType
     {
   
     /**
@@ -42,10 +43,24 @@ public enum SipMessageType implements EnumConverter<String>
      */
     IGNORE;
     
-
-    private static ReverseEnumMap<String, SipMessageType> s_map = 
-        new ReverseEnumMap<String, SipMessageType>(SipMessageType.class);
     
+    private static final Map<String, SipMessageType> s_stringsToEnums =
+        new HashMap<String, SipMessageType>();
+    
+    
+    static
+        {
+        for (final SipMessageType type : values())
+            {
+            s_stringsToEnums.put(type.convert(), type);
+            }
+        }
+    
+    /**
+     * Converts the enum to a {@link String}.
+     * 
+     * @return The {@link String} for the enum.
+     */
     public String convert()
         {
         return this.m_type;
@@ -60,7 +75,7 @@ public enum SipMessageType implements EnumConverter<String>
      */
     public static SipMessageType convert(final String type)
         {
-        return s_map.get(type);
+        return s_stringsToEnums.get(type);
         }
     
     /**
@@ -73,7 +88,7 @@ public enum SipMessageType implements EnumConverter<String>
      */
     public static boolean contains(final String type)
         {
-        return s_map.contains(type);
+        return s_stringsToEnums.containsKey(type);
         }
     
     private final String m_type;
