@@ -1,5 +1,6 @@
 package org.lastbamboo.common.sip.stack.codec;
 
+import org.apache.commons.lang.StringUtils;
 import org.lastbamboo.common.util.EnumConverter;
 import org.lastbamboo.common.util.ReverseEnumMap;
 
@@ -33,7 +34,13 @@ public enum SipMessageType implements EnumConverter<String>
     /**
      * Unknown message type.
      */
-    UNKNOWN("fjdkafj");
+    UNKNOWN, 
+    
+    /**
+     * A message ID we should just ignore.  The server seems to get random
+     * whitespace from time to time, for example, and we should just move on.
+     */
+    IGNORE;
     
 
     private static ReverseEnumMap<String, SipMessageType> s_map = 
@@ -70,6 +77,11 @@ public enum SipMessageType implements EnumConverter<String>
         }
     
     private final String m_type;
+    
+    private SipMessageType()
+        {
+        this.m_type = StringUtils.EMPTY;
+        }
     
     private SipMessageType(final String type)
         {
