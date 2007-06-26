@@ -97,7 +97,7 @@ public abstract class SipMessageDecodingState extends DecodingStateMachine
                     // it out to be visited.
                     final SipMessage doubleCrlf = new DoubleCrlfKeepAlive();
                     out.write(doubleCrlf);
-                    return new ReadFirstLineState();
+                    return null;
                 case UNKNOWN:
                     final String method = (String) childProducts.get(1);
                     final URI uri = (URI) childProducts.get(2);

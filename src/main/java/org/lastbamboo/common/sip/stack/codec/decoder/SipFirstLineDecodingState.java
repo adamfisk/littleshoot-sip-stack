@@ -5,7 +5,6 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
@@ -92,11 +91,6 @@ abstract class SipFirstLineDecodingState extends DecodingStateMachine
                     return new ReadRequestUriState();
                 case DOUBLE_CRLF:
                     return new ReadCrCrlfDecodingState();
-                case IGNORE:
-                    // Just pretend it never happened and stay in this state.
-                    // This is what we want when receiving random whitspace,
-                    // for example.
-                    return new MessageTypeDecodingState();
                 case UNKNOWN:
                     // Maybe it's a method we don't know about?  Assume it's
                     // some sort of request and process it as such.
@@ -117,11 +111,6 @@ abstract class SipFirstLineDecodingState extends DecodingStateMachine
             else
                 {
                 final String firstWord = product.getString(m_asciiDecoder);
-                if (StringUtils.isBlank(firstWord))
-                    {
-                    LOG.warn("Received random whitespace: '"+firstWord+"'");
-                    return SipMessageType.IGNORE;
-                    }
 
                 if (!SipMessageType.contains(firstWord))
                     {

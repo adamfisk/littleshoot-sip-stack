@@ -36,12 +36,7 @@ public enum SipMessageType
      * Unknown message type.
      */
     UNKNOWN, 
-    
-    /**
-     * A message ID we should just ignore.  The server seems to get random
-     * whitespace from time to time, for example, and we should just move on.
-     */
-    IGNORE;
+    ;
     
     
     private static final Map<String, SipMessageType> s_stringsToEnums =
