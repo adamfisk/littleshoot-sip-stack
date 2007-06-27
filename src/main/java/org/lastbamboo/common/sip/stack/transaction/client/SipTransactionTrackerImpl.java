@@ -74,7 +74,11 @@ public class SipTransactionTrackerImpl implements SipTransactionTracker,
         final String key = getTransactionKey(message);
         
         LOG.debug("Removing transaction with key '" + key + "'");
-        this.m_transactions.remove(key);
+        final SipClientTransaction removed = this.m_transactions.remove(key);
+        if (removed == null)
+            {
+            LOG.warn("Could not find transaction!!");
+            }
         }
 
     }

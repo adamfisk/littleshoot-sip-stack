@@ -98,11 +98,14 @@ public class SipClientTransactionImpl implements SipClientTransaction
     
     public void visitResponse(final SipResponse response)
         {
+        LOG.debug("SIP client transaction visiting response...");
         if (this.m_timerBFired)
             {
             LOG.warn("Received response after timer B fired!!");
             return;
             }
+        
+        LOG.debug("Canceling TIMER B");
         // Tell timer B not to fire.
         this.m_timerB.cancel();
         
