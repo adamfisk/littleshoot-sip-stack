@@ -61,6 +61,7 @@ public class SipMessageEncoderImpl implements SipMessageEncoder
     private void encodeHeaders(final SipMessage message, 
         final ByteBuffer buffer)
         {
+        LOG.debug("Appending headers: {}", message.getHeaders());
         final Map<String, SipHeader> headers = message.getHeaders();
         for (final Map.Entry<String, SipHeader> entry : headers.entrySet())
             {
@@ -107,9 +108,9 @@ public class SipMessageEncoderImpl implements SipMessageEncoder
         }
 
     /**
-     * Writes the response body bytes, if any, to the specified buffer
+     * Writes the message body bytes, if any, to the specified buffer
      * 
-     * @param message The response
+     * @param message The message.
      * @param buffer The buffer to write to
      */
     private void encodeBody(final SipMessage message, final ByteBuffer buffer)
