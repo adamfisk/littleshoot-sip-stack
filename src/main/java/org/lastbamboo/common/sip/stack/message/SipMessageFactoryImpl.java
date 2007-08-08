@@ -107,6 +107,20 @@ public class SipMessageFactoryImpl implements SipMessageFactory
         return response;
         }
     
+    public SipMessage createErrorResponse(final SipMessage request, 
+        final UUID instanceId, final URI contactUri, final int responseCode, 
+        final String reasonPhrase)
+        {
+        final Map<String, SipHeader> headers = createResponseHeaders(request);
+        addRecordRoute(request, headers);
+        addContact(headers, instanceId, contactUri);
+        
+        // TODO: We don't currently include the warning header.
+        final SipResponse response = 
+            new SipResponse(responseCode, reasonPhrase, headers);
+        return response;
+        }
+    
     public Register addVia(final Register message, final SipHeader newHeader)
         {
         final Map<String, SipHeader> headers = 
@@ -214,7 +228,7 @@ public class SipMessageFactoryImpl implements SipMessageFactory
      * @param request The request to copy the header from.
      * @param headers The headers to copy into.
      */
-    private void addRecordRoute(final Invite request, 
+    private void addRecordRoute(final SipMessage request, 
         final Map<String, SipHeader> headers)
         {
         copyHeader(headers, request, SipHeaderNames.RECORD_ROUTE);
@@ -350,4 +364,5 @@ public class SipMessageFactoryImpl implements SipMessageFactory
         return new Invite(invite.getStartLine(), headers, 
             invite.getBody());
         }
+
     }

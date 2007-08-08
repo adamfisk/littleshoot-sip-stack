@@ -56,6 +56,20 @@ public interface SipMessageFactory
      */
     SipResponse createInviteOk(Invite request, UUID instanceId, 
         URI contactUri, ByteBuffer body);
+    
+
+    /**
+     * Creates an error response to the specified request.
+     * 
+     * @param request The request to create a response for.
+     * @param instanceId The instance ID of the resonding peer.
+     * @param contactUri The contact URI of the responding peer.
+     * @param responseCode The reason code for the response.
+     * @param reasonPhrase The reason phrase for the response.
+     * @return The new response message.
+     */
+    SipMessage createErrorResponse(SipMessage request, UUID instanceId, 
+        URI contactUri, int responseCode, String reasonPhrase);
 
     /**
      * Creates a register OK message from the specified request.

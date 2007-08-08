@@ -43,7 +43,7 @@ public class SipIoHandler implements IoHandler
             {
             LOG.warn("Unexpected exception:", cause);
             }
-          session.close();
+        session.close();
         }
 
     public final void messageReceived(final IoSession session, 
