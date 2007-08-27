@@ -1,15 +1,11 @@
 package org.lastbamboo.common.sip.stack.codec;
 
-import java.util.List;
-
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolDecoder;
-import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.lastbamboo.common.sip.stack.codec.decoder.SipMessageDecodingState;
 import org.lastbamboo.common.sip.stack.codec.encoder.SipMessageProtocolEncoder;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
-import org.lastbamboo.common.util.mina.DecodingState;
 import org.lastbamboo.common.util.mina.StateMachineProtocolDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,11 +16,9 @@ import org.slf4j.LoggerFactory;
 public class SipProtocolCodecFactory implements ProtocolCodecFactory
     {
 
-    private final Logger LOG = 
+    private final Logger m_log = 
         LoggerFactory.getLogger(SipProtocolCodecFactory.class);
     private final SipHeaderFactory m_headerFactory;
-    
-    private static int s_readMessages = 0;
     
     /**
      * Creates a new codec factory for SIP messages.
@@ -38,8 +32,9 @@ public class SipProtocolCodecFactory implements ProtocolCodecFactory
 
     public ProtocolDecoder getDecoder() throws Exception
         {
+        m_log.debug("Creating new decoder...");
         final SipMessageDecodingState startState = 
-            new TopLevelSipMessageDecodingState(m_headerFactory);
+            new SipMessageDecodingState(m_headerFactory);
 
         return new StateMachineProtocolDecoder(startState);
         }
@@ -47,34 +42,6 @@ public class SipProtocolCodecFactory implements ProtocolCodecFactory
     public ProtocolEncoder getEncoder() throws Exception
         {
         return new SipMessageProtocolEncoder();
-        }
-    
-    private final class TopLevelSipMessageDecodingState 
-        extends SipMessageDecodingState
-        {
-        
-        private TopLevelSipMessageDecodingState(
-            final SipHeaderFactory headerFactory)
-            {
-            super(headerFactory);
-            LOG.debug("Created new top level SIP message decoder...");
-            }
-
-        @Override
-        protected DecodingState finishDecode(
-            final List<Object> childProducts, 
-            final ProtocolDecoderOutput out) throws Exception
-            {
-            s_readMessages++;
-            if (LOG.isDebugEnabled())
-                {
-                LOG.debug("Finished decoding message: "  + childProducts);
-                LOG.debug("Now read "+s_readMessages+" messages...");
-                }
-            out.write(childProducts.get(0));
-            return new TopLevelSipMessageDecodingState(m_headerFactory);
-            }
-    
         }
 
     }

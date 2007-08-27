@@ -24,11 +24,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * State machine for decoding SIP messages.  This whole state-machine scheme
- * is taken directly from AsyncWeb.  AsyncWeb rocks.  You should check it out.
- * Wish I could take more credit.
+ * State machine for decoding SIP messages. 
  */
-public abstract class SipMessageDecodingState extends DecodingStateMachine 
+public class SipMessageDecodingState extends DecodingStateMachine 
     {
 
     private final Logger LOG = 
@@ -51,13 +49,21 @@ public abstract class SipMessageDecodingState extends DecodingStateMachine
         }
     
     @Override
-    protected DecodingState init() throws Exception
+    protected DecodingState init()
         {
         return new ReadFirstLineState();
         }
+    
+    @Override
+    protected DecodingState finishDecode(final List<Object> childProducts, 
+        final ProtocolDecoderOutput out)
+        {
+        LOG.error("Got finish decode for full message");
+        return null;
+        }
 
     @Override
-    protected void destroy() throws Exception
+    protected void destroy()
         {
         }
     
@@ -97,7 +103,7 @@ public abstract class SipMessageDecodingState extends DecodingStateMachine
                     // it out to be visited.
                     final SipMessage doubleCrlf = new DoubleCrlfKeepAlive();
                     out.write(doubleCrlf);
-                    return new ReadFirstLineState();
+                    return null;
                 case UNKNOWN:
                     final String method = (String) childProducts.get(1);
                     final URI uri = (URI) childProducts.get(2);
@@ -166,7 +172,7 @@ public abstract class SipMessageDecodingState extends DecodingStateMachine
             final SipMessage message = 
                 m_messageFactory.createSipMessage(m_headers, readData);
             out.write(message);
-            return new ReadFirstLineState();
+            return null;
             }
         }
     }
