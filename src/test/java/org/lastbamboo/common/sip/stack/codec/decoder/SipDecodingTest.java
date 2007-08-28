@@ -20,10 +20,12 @@ import org.lastbamboo.common.sip.stack.message.Invite;
 import org.lastbamboo.common.sip.stack.message.SipMessage;
 import org.lastbamboo.common.sip.stack.message.SipMessageFactory;
 import org.lastbamboo.common.sip.stack.message.SipMessageFactoryImpl;
+import org.lastbamboo.common.sip.stack.message.SipResponse;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactoryImpl;
 import org.lastbamboo.common.util.mina.ByteBufferUtils;
+import org.lastbamboo.common.util.mina.MinaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,13 +141,30 @@ public class SipDecodingTest
         messages.add(new DoubleCrlfKeepAlive());
         messages.add(createNoBodyInvite());
         messages.add(new DoubleCrlfKeepAlive());
+        messages.add(createInviteOk());
+        messages.add(createInviteOk());
+        messages.add(createNoBodyInvite());
         messages.add(createNoBodyInvite());
         messages.add(createInvite());
         messages.add(new DoubleCrlfKeepAlive());
         messages.add(createInvite());
         messages.add(createNoBodyInvite());
         messages.add(createInvite());
+        messages.add(createInvite());
+        messages.add(createInviteOk());
         messages.add(new DoubleCrlfKeepAlive());
+        messages.add(new DoubleCrlfKeepAlive());
+        messages.add(createInvite());
+        messages.add(createNoBodyInvite());
+        messages.add(createInvite());
+        messages.add(createInviteOk());
+        messages.add(createInviteOk());
+        messages.add(new DoubleCrlfKeepAlive());
+        messages.add(new DoubleCrlfKeepAlive());
+        messages.add(new DoubleCrlfKeepAlive());
+        messages.add(createInvite());
+        messages.add(createNoBodyInvite());
+        messages.add(createInviteOk());
         final ByteBuffer buf = combine(messages.toArray(new SipMessage[0]));
         
         final SipHeaderFactory headerFactory = new SipHeaderFactoryImpl();
@@ -253,6 +272,30 @@ public class SipDecodingTest
         final SipHeader via = headerFactory.createHeader("Via", viaValue);
     
         return messageFactory.addVia(request, via);
+        }
+    
+    private static SipResponse createInviteOk() 
+        throws Exception
+        {
+        final SipHeaderFactory headerFactory = new SipHeaderFactoryImpl();
+        final SipMessageFactory messageFactory = 
+            new SipMessageFactoryImpl(headerFactory);
+        final UUID instanceId = UUID.randomUUID();
+        final Invite invite = createInvite();
+        
+        final String sdp = 
+            "v=0\r\n" +
+            "o=alice 53655765 2353687637 IN IP4 pc33.atlanta.com\r\n" +
+            "s=Session SDP\r\n" +
+            "t=0 0\r\n" +
+            "c=IN IP4 pc33.atlanta.com\r\n" +
+            "m=audio 3456 RTP/AVP 0 1 3 99\r\n" +
+            "a=rtpmap:0 PCMU/8000";
+        final URI contactUri = new URI("alice@atlanta.com");
+        final SipResponse ok = 
+            messageFactory.createInviteOk(invite, instanceId, contactUri, 
+                MinaUtils.toBuf(sdp));
+        return ok;
         }
 
     }
