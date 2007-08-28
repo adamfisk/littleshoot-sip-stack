@@ -49,7 +49,7 @@ public class SipMessageUtils
      */
     public static String toParamString(final Map paramsMap)
         {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         //sb.append(value);
         final Collection params = paramsMap.entrySet();
         for (final Iterator iter = params.iterator(); iter.hasNext();)
@@ -332,11 +332,15 @@ public class SipMessageUtils
         return new InetSocketAddress(hostString, port);
         }
 
-    public static int extractContentLength(Map<String, SipHeader> headers)
+    public static int extractContentLength(final Map<String, SipHeader> headers)
         {
         final SipHeader header = headers.get(SipHeaderNames.CONTENT_LENGTH);
         if (header == null)
             {
+            if (LOG.isDebugEnabled())
+                {
+                LOG.debug("No Content-Length header");
+                }
             return 0;
             }
         final String lengthString = header.getValue().getBaseValue();
@@ -344,6 +348,10 @@ public class SipMessageUtils
             {
             LOG.warn("Content-Length not a number: " + lengthString);
             return 0;
+            }
+        if (LOG.isDebugEnabled())
+            {
+            LOG.debug("Parsing length: "+lengthString);
             }
         return Integer.parseInt(lengthString);
         }

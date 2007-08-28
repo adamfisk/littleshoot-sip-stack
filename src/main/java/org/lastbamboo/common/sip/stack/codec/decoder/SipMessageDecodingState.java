@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.SimpleByteBufferAllocator;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.lastbamboo.common.sip.stack.codec.SipMessageType;
 import org.lastbamboo.common.sip.stack.message.DoubleCrlfKeepAlive;
@@ -31,6 +32,12 @@ public class SipMessageDecodingState extends DecodingStateMachine
 
     private final Logger LOG = 
         LoggerFactory.getLogger(SipMessageDecodingState.class);
+    
+    static
+        {
+        ByteBuffer.setUseDirectBuffers(false);
+        ByteBuffer.setAllocator(new SimpleByteBufferAllocator());
+        }
     
     private static final ByteBuffer EMPTY_BODY = ByteBuffer.allocate(0);
     
@@ -105,11 +112,9 @@ public class SipMessageDecodingState extends DecodingStateMachine
                     out.write(doubleCrlf);
                     return null;
                 case UNKNOWN:
-                    final String method = (String) childProducts.get(1);
-                    final URI uri = (URI) childProducts.get(2);
-                    LOG.warn("Unknown request method: "+method);
+                    final URI uri = (URI) childProducts.get(1);
                     m_messageFactory = 
-                        new UnknownSipRequestFactory(method, uri);
+                        new UnknownSipRequestFactory("Unknown", uri);
                     break;
                 default:
                     LOG.warn("Not handling type: "+messageType);
@@ -136,10 +141,12 @@ public class SipMessageDecodingState extends DecodingStateMachine
             final int length = SipMessageUtils.extractContentLength(headers);
             if (length > 0)
                 {
+                LOG.debug("Reading body with length: {}", length);
                 return new ReadBodyState(headers, length);
                 }
             else
                 {
+                LOG.debug("Returning SIP message with NO body...");
                 final SipMessage message = 
                     m_messageFactory.createSipMessage(headers, EMPTY_BODY);
                 
@@ -169,6 +176,7 @@ public class SipMessageDecodingState extends DecodingStateMachine
         protected DecodingState finishDecode(final ByteBuffer readData, 
             final ProtocolDecoderOutput out) throws Exception
             {
+            LOG.debug("Returning SIP message with body...");
             final SipMessage message = 
                 m_messageFactory.createSipMessage(m_headers, readData);
             out.write(message);

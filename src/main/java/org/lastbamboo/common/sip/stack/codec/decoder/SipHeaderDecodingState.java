@@ -113,6 +113,7 @@ abstract class SipHeaderDecodingState extends DecodingStateMachine
             final ProtocolDecoderOutput out) throws Exception
             {
             final String headerValue = product.getString(m_asciiDecoder);
+            LOG.debug("Read header value: {}", headerValue);
             final SipHeader header = 
                 m_headerFactory.createHeader(this.m_headerName, headerValue);
             m_headers.put(this.m_headerName, header);

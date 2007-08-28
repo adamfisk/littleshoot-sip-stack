@@ -77,8 +77,9 @@ abstract class SipFirstLineDecodingState extends DecodingStateMachine
             throws Exception
             {
             final SipMessageType messageType = 
-                determineMessageType(terminator, product, out);
-                
+                determineMessageType(terminator, product);
+            
+            LOG.debug("Founding message type: {}", messageType);
             out.write(messageType);
             
             switch (messageType)
@@ -101,8 +102,7 @@ abstract class SipFirstLineDecodingState extends DecodingStateMachine
             }
 
         private SipMessageType determineMessageType(final byte terminator, 
-            final ByteBuffer product, final ProtocolDecoderOutput out) 
-            throws CharacterCodingException
+            final ByteBuffer product) throws CharacterCodingException
             {
             if (terminator == MinaCodecUtils.CR)
                 {
@@ -116,13 +116,12 @@ abstract class SipFirstLineDecodingState extends DecodingStateMachine
                 if (!SipMessageType.contains(firstWord))
                     {
                     LOG.warn("Unknown message type: '{}'", firstWord);
-                    out.write(firstWord);
                     return SipMessageType.UNKNOWN;
                     }
                 
                 else
                     {
-                    LOG.debug("Matching message type for: ", firstWord);
+                    LOG.debug("Matching message type for: {}", firstWord);
                     return SipMessageType.convert(firstWord);              
                     }
                 }

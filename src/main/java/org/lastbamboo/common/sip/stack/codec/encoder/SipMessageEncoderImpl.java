@@ -72,27 +72,27 @@ public class SipMessageEncoderImpl implements SipMessageEncoder
             MinaCodecUtils.appendCRLF(m_buffer);
             }
     
-        public void visitInvite(Invite invite)
+        public void visitInvite(final Invite invite)
             {
             standardEncode(invite);
             }
     
-        public void visitRegister(Register register)
+        public void visitRegister(final Register register)
             {
             standardEncode(register);
             }
     
-        public void visitRequestTimedOut(RequestTimeoutResponse response)
+        public void visitRequestTimedOut(final RequestTimeoutResponse response)
             {
             standardEncode(response);
             }
     
-        public void visitResponse(SipResponse response)
+        public void visitResponse(final SipResponse response)
             {
             standardEncode(response);
             }
     
-        public void visitUnknownRequest(UnknownSipRequest request)
+        public void visitUnknownRequest(final UnknownSipRequest request)
             {
             }
     

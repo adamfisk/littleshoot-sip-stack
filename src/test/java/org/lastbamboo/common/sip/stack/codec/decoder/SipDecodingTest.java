@@ -8,15 +8,18 @@ import java.util.List;
 
 import org.apache.commons.id.uuid.UUID;
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.SimpleByteBufferAllocator;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.lastbamboo.common.sip.stack.codec.SipProtocolCodecFactory;
 import org.lastbamboo.common.sip.stack.codec.encoder.SipMessageEncoder;
 import org.lastbamboo.common.sip.stack.codec.encoder.SipMessageEncoderImpl;
 import org.lastbamboo.common.sip.stack.message.DoubleCrlfKeepAlive;
 import org.lastbamboo.common.sip.stack.message.Invite;
+import org.lastbamboo.common.sip.stack.message.Register;
 import org.lastbamboo.common.sip.stack.message.SipMessage;
 import org.lastbamboo.common.sip.stack.message.SipMessageFactory;
 import org.lastbamboo.common.sip.stack.message.SipMessageFactoryImpl;
@@ -36,6 +39,16 @@ public class SipDecodingTest
     {
 
     private final Logger m_log = LoggerFactory.getLogger(getClass());
+    
+    /**
+     * MINA does some funky things if we don't do this first.
+     */
+    @Before
+    public void setUp()
+        {
+        ByteBuffer.setUseDirectBuffers(false);
+        ByteBuffer.setAllocator(new SimpleByteBufferAllocator());
+        }
     
     /**
      * Test for basic SIP message decoding of many full messages.
@@ -72,7 +85,6 @@ public class SipDecodingTest
                 {
                 messages.add(message);
                 }
-            
             };
         decoder.decode(null, manyMessages, out);
         
@@ -137,6 +149,7 @@ public class SipDecodingTest
     public void ultimateSipDecodingTest() throws Exception
         {
         final Collection<SipMessage> messages = new LinkedList<SipMessage>();
+
         messages.add(createInvite());
         messages.add(new DoubleCrlfKeepAlive());
         messages.add(createNoBodyInvite());
@@ -164,7 +177,15 @@ public class SipDecodingTest
         messages.add(new DoubleCrlfKeepAlive());
         messages.add(createInvite());
         messages.add(createNoBodyInvite());
+        
         messages.add(createInviteOk());
+        messages.add(createInvite());
+        messages.add(createRegister());
+        messages.add(createNoBodyInvite());
+        messages.add(createInviteOkNoBody());
+        messages.add(createRegisterOk());
+        messages.add(createInvite());
+        
         final ByteBuffer buf = combine(messages.toArray(new SipMessage[0]));
         
         final SipHeaderFactory headerFactory = new SipHeaderFactoryImpl();
@@ -206,7 +227,7 @@ public class SipDecodingTest
             index++;
             }
         }
-    
+
     private static ByteBuffer combine(final SipMessage... messages)
         {
         final SipMessageEncoder encoder = new SipMessageEncoderImpl();
@@ -274,12 +295,48 @@ public class SipDecodingTest
         return messageFactory.addVia(request, via);
         }
     
-    private static SipResponse createInviteOk() 
-        throws Exception
+    
+    private static Register createRegister() throws Exception
         {
-        final SipHeaderFactory headerFactory = new SipHeaderFactoryImpl();
         final SipMessageFactory messageFactory = 
-            new SipMessageFactoryImpl(headerFactory);
+            new SipMessageFactoryImpl();
+        
+        final URI contactUri = new URI("alice@atlanta.com");
+        final UUID instanceId = UUID.randomUUID();
+        
+        final URI domain = new URI("sip:lastbamboo.org");
+        final URI client = new URI("sip:4279@lastbamboo.org");
+        return messageFactory.createRegisterRequest(
+            domain, "Anonymous", client, instanceId, contactUri);
+        }
+    
+    
+    private static SipMessage createRegisterOk() throws Exception
+        {
+        final SipMessageFactory messageFactory = 
+            new SipMessageFactoryImpl();
+        final Register register = createRegister();
+        return messageFactory.createRegisterOk(register);
+        }
+    
+    private static SipResponse createInviteOkNoBody() throws Exception
+        {
+        final SipMessageFactory messageFactory = 
+            new SipMessageFactoryImpl();
+        final UUID instanceId = UUID.randomUUID();
+        final Invite invite = createInvite();
+        final URI contactUri = new URI("alice@atlanta.com");
+        final SipResponse ok = 
+            messageFactory.createInviteOk(invite, instanceId, contactUri, 
+                ByteBuffer.allocate(0));
+        
+        return ok;
+        }
+    
+    private static SipResponse createInviteOk() throws Exception
+        {
+        final SipMessageFactory messageFactory = 
+            new SipMessageFactoryImpl();
         final UUID instanceId = UUID.randomUUID();
         final Invite invite = createInvite();
         
@@ -295,6 +352,7 @@ public class SipDecodingTest
         final SipResponse ok = 
             messageFactory.createInviteOk(invite, instanceId, contactUri, 
                 MinaUtils.toBuf(sdp));
+        
         return ok;
         }
 
