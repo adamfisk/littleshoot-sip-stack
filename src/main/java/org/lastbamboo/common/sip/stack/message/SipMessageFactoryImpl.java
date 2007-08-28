@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.mina.common.ByteBuffer;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
+import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactoryImpl;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderImpl;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderNames;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderParamNames;
@@ -45,6 +46,14 @@ public class SipMessageFactoryImpl implements SipMessageFactory
     public SipMessageFactoryImpl(final SipHeaderFactory headerFactory)
         {
         this.m_headerFactory = headerFactory;
+        }
+    
+    /**
+     * Creates a new SIP message factory with the default header factory.
+     */
+    public SipMessageFactoryImpl()
+        {
+        this(new SipHeaderFactoryImpl());
         }
 
     public Register createRegisterRequest(final URI requestUri, 

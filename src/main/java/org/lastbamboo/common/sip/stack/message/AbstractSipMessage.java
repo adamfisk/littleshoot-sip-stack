@@ -168,4 +168,9 @@ public abstract class AbstractSipMessage implements SipMessage
         return this.m_startLine;
         }
 
+    @Override
+    public String toString()
+        {
+        return getClass().getSimpleName();
+        }
     }

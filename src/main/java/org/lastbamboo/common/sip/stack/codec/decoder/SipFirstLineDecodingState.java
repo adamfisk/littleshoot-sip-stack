@@ -106,6 +106,7 @@ abstract class SipFirstLineDecodingState extends DecodingStateMachine
             {
             if (terminator == MinaCodecUtils.CR)
                 {
+                LOG.debug("Returning double CRLF");
                 return SipMessageType.DOUBLE_CRLF;
                 }
             else
@@ -121,6 +122,7 @@ abstract class SipFirstLineDecodingState extends DecodingStateMachine
                 
                 else
                     {
+                    LOG.debug("Matching message type for: ", firstWord);
                     return SipMessageType.convert(firstWord);              
                     }
                 }

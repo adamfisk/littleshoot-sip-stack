@@ -35,7 +35,7 @@ public enum SipMessageType
     /**
      * Unknown message type.
      */
-    UNKNOWN, 
+    UNKNOWN("UNKNOWN"), 
     ;
     
     

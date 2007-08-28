@@ -21,8 +21,6 @@ public class DoubleCrlfKeepAlive implements SipMessage
     private static final ByteBuffer DOUBLE_CRLF = 
         ByteBuffer.wrap(StringUtils.toAsciiBytes("\r\n\r\n"));
     
-    private static final ByteBuffer EMPTY_BYTE_BUFFER = ByteBuffer.allocate(0);
-    
     public void accept(final SipMessageVisitor visitor)
         {
         visitor.visitDoubleCrlfKeepAlive(this);
@@ -30,17 +28,12 @@ public class DoubleCrlfKeepAlive implements SipMessage
 
     public ByteBuffer getBody()
         {
-        return EMPTY_BYTE_BUFFER;
+        return DOUBLE_CRLF.duplicate();
         }
 
     public String getBranchId()
         {
         return org.apache.commons.lang.StringUtils.EMPTY;
-        }
-
-    public ByteBuffer getBytes()
-        {
-        return DOUBLE_CRLF;
         }
 
     public SipHeader getHeader(final String headerName)
@@ -66,11 +59,6 @@ public class DoubleCrlfKeepAlive implements SipMessage
     public String getStartLine()
         {
         return org.apache.commons.lang.StringUtils.EMPTY;
-        }
-
-    public int getTotalLength()
-        {
-        return DOUBLE_CRLF.capacity();
         }
 
     }
