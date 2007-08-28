@@ -1,11 +1,13 @@
 package org.lastbamboo.common.sip.stack.transport;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
-import junit.framework.TestCase;
-
 import org.apache.mina.common.IoSession;
+import org.junit.Test;
 import org.lastbamboo.common.sip.stack.message.SipMessageFactory;
 import org.lastbamboo.common.sip.stack.message.SipMessageFactoryImpl;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
@@ -20,7 +22,7 @@ import org.lastbamboo.common.sip.stack.transaction.client.SipTransactionTrackerI
 /**
  * Test for the TCP transport layer.
  */
-public class SipTcpTransportLayerImplTest extends TestCase
+public class SipTcpTransportLayerImplTest
     {
 
     /**
@@ -28,13 +30,16 @@ public class SipTcpTransportLayerImplTest extends TestCase
      * 
      * @throws Exception If any unexpected error occurs.
      */
+    @Test
     public void testConnectionMapping() throws Exception 
         {
         final SipHeaderFactory headerFactory = new SipHeaderFactoryImpl();
+        
         final SipMessageFactory messageFactory = 
             new SipMessageFactoryImpl(headerFactory);
         final SipTransactionTracker transactionTracker = 
             new SipTransactionTrackerImpl();
+        
         final SipTransactionFactory transactionFactory = 
             new SipTransactionFactoryImpl(transactionTracker, messageFactory,
                 500);
@@ -42,7 +47,7 @@ public class SipTcpTransportLayerImplTest extends TestCase
             new SipTcpTransportLayerImpl(transactionFactory, headerFactory, 
                 messageFactory);
         
-        //final ReaderWriter rw = new ReaderWriterStub();
+        
         final IoSession io = new IoSessionStub();
         final InetSocketAddress sa = (InetSocketAddress) io.getRemoteAddress();
         transport.addConnection(io);

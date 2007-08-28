@@ -38,7 +38,7 @@ public class SipMessageProtocolEncoder implements ProtocolEncoder,
             LOG.debug("Attempted encodes: "+s_encodeAttempts);
             }
         final ByteBuffer buffer = this.m_encoder.encode((SipMessage) message);
-        LOG.debug("Writing buffer: \n{}", MinaUtils.toAsciiString(buffer));
+        //LOG.debug("Writing buffer: \n{}", MinaUtils.toAsciiString(buffer));
         
         out.write(buffer);
         }

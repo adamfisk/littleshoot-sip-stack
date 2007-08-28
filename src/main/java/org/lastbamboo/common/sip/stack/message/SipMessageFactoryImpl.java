@@ -12,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.SimpleByteBufferAllocator;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactoryImpl;
@@ -35,6 +36,18 @@ public class SipMessageFactoryImpl implements SipMessageFactory
         LogFactory.getLog(SipMessageFactoryImpl.class);
 
     private final SipHeaderFactory m_headerFactory;
+    
+    /**
+     * If this is not set for tests or anything else, it causes massive 
+     * trauma.  In particular, ByteBuffer.allocate(0) creates a 
+     * ByteBuffer with a capacity of 1 -- odd behavior that cause various
+     * problems.
+     */
+    static
+        {
+        ByteBuffer.setUseDirectBuffers(false);
+        ByteBuffer.setAllocator(new SimpleByteBufferAllocator());
+        }
     
     private static final ByteBuffer EMPTY_BODY = ByteBuffer.allocate(0);
     

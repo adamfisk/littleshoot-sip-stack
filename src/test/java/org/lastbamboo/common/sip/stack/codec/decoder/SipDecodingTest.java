@@ -177,7 +177,6 @@ public class SipDecodingTest
         messages.add(new DoubleCrlfKeepAlive());
         messages.add(createInvite());
         messages.add(createNoBodyInvite());
-        
         messages.add(createInviteOk());
         messages.add(createInvite());
         messages.add(createRegister());

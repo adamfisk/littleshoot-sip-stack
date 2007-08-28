@@ -33,6 +33,12 @@ public class SipMessageDecodingState extends DecodingStateMachine
     private final Logger LOG = 
         LoggerFactory.getLogger(SipMessageDecodingState.class);
     
+    /**
+     * If this is not set for tests or anything else, it causes massive 
+     * trauma.  In particular, ByteBuffer.allocate(0) creates a 
+     * ByteBuffer with a capacity of 1 -- odd behavior that cause various
+     * problems.
+     */
     static
         {
         ByteBuffer.setUseDirectBuffers(false);
