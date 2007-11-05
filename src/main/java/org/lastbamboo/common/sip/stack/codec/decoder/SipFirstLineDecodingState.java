@@ -79,7 +79,7 @@ abstract class SipFirstLineDecodingState extends DecodingStateMachine
             final SipMessageType messageType = 
                 determineMessageType(terminator, product);
             
-            LOG.debug("Founding message type: {}", messageType);
+            LOG.debug("Found message type: {}", messageType);
             out.write(messageType);
             
             switch (messageType)
