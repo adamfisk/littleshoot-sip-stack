@@ -259,9 +259,9 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
         {
         synchronized (this.m_socketAddressesToIo)
             {
-            final Collection existingAddresses = 
+            final Collection<InetSocketAddress> existingAddresses = 
                 this.m_socketAddressesToIo.keySet();
-            final Collection intersection = 
+            final Collection<InetSocketAddress> intersection = 
                 CollectionUtils.intersection(existingAddresses, 
                     socketAddresses);
             if (LOG.isDebugEnabled())
@@ -269,10 +269,8 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
                 LOG.debug("Found "+intersection.size()+
                     " matching connections...");
                 }
-            for (final Iterator iter = intersection.iterator(); iter.hasNext();)
+            for (final InetSocketAddress socketAddress : intersection)
                 {
-                final InetSocketAddress socketAddress = 
-                    (InetSocketAddress) iter.next();
                 final IoSession io = 
                     this.m_socketAddressesToIo.get(socketAddress);
                 writeRequestStatelessly(request, io);
@@ -303,7 +301,7 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
             {
             LOG.warn("Existing connections: "+
                 this.m_socketAddressesToIo);
-            final StringBuffer sb = new StringBuffer();
+            final StringBuilder sb = new StringBuilder();
             final Collection keys = 
                 this.m_socketAddressesToIo.keySet();
             for (final Iterator iter = keys.iterator(); iter.hasNext();)
