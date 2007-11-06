@@ -200,7 +200,7 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
     
     private void write(final SipMessage message, final IoSession io)
         {
-        write(message, io, false);
+        write(message, io, true);
         }
     
     private void write(final SipMessage message, final IoSession io, 
