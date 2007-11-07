@@ -15,6 +15,7 @@ import org.apache.mina.common.IoSessionConfig;
 import org.apache.mina.common.TrafficMask;
 import org.apache.mina.common.TransportType;
 import org.apache.mina.common.WriteFuture;
+import org.apache.mina.common.support.DefaultWriteFuture;
 
 /**
  * Stub class for an IO session.
@@ -286,8 +287,7 @@ public class IoSessionStub implements IoSession
 
     public WriteFuture write(Object message)
         {
-        // TODO Auto-generated method stub
-        return null;
+        return new DefaultWriteFuture(this);
         }
 
     public Object getAttribute(String arg0, Object arg1)
