@@ -37,6 +37,7 @@ public class SipIoHandler extends IoHandlerAdapter
         m_visitorFactory = visitorFactory;
         }
 
+    @Override
     public void exceptionCaught(final IoSession session, 
         final Throwable cause) throws Exception
         {
@@ -47,6 +48,7 @@ public class SipIoHandler extends IoHandlerAdapter
         session.close();
         }
 
+    @Override
     public final void messageReceived(final IoSession session, 
         final Object message) throws Exception
         {
@@ -82,13 +84,16 @@ public class SipIoHandler extends IoHandlerAdapter
         // The idle time is in seconds.  If there's been no traffic in either
         // direction for awhile, we free the connection to limit load on the
         // server.
+        
+        // Even though SIP governs online status, clients still send traffic to keep 
+        // connections open.  If they don't, we should close them.
         session.setIdleTime(IdleStatus.BOTH_IDLE, 300);
         }
 
     @Override
     public void sessionIdle(final IoSession session, final IdleStatus status)
         {
-        LOG.warn("Killing idle session");
+        LOG.warn("Killing idle session: {}", session);
         // Kill idle sessions.
         session.close();
         }
