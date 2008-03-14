@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 public class SipIoHandler extends IoHandlerAdapter
     {
 
-    private final Logger LOG = 
+    private final Logger m_log = 
         LoggerFactory.getLogger(SipIoHandler.class);
     
     private final SipMessageVisitorFactory m_visitorFactory;
@@ -43,7 +43,7 @@ public class SipIoHandler extends IoHandlerAdapter
         {
         if (!(cause instanceof IOException)) 
             {
-            LOG.warn("Unexpected exception:", cause);
+            m_log.warn("Unexpected exception:", cause);
             }
         session.close();
         }
@@ -53,9 +53,9 @@ public class SipIoHandler extends IoHandlerAdapter
         final Object message) throws Exception
         {
         s_messagesRead++;
-        if (LOG.isDebugEnabled())
+        if (m_log.isDebugEnabled())
             {
-            LOG.debug("Messages read:{} ", s_messagesRead);
+            m_log.debug("Messages read:{} ", s_messagesRead);
             }
         final SipMessage sipMessage = (SipMessage) message;
         final SipMessageVisitor visitor = 
@@ -63,15 +63,18 @@ public class SipIoHandler extends IoHandlerAdapter
         sipMessage.accept(visitor);
         }
     
+    @Override
     public void messageSent(final IoSession session, final Object message) 
         throws Exception
         {
         }
 
+    @Override
     public void sessionOpened(final IoSession session) throws Exception
         {
         }
     
+    @Override
     public void sessionClosed(final IoSession session) throws Exception
         {
         }
@@ -85,15 +88,15 @@ public class SipIoHandler extends IoHandlerAdapter
         // direction for awhile, we free the connection to limit load on the
         // server.
         
-        // Even though SIP governs online status, clients still send traffic to keep 
-        // connections open.  If they don't, we should close them.
+        // Even though SIP governs online status, clients still send traffic to 
+        // keep connections open.  If they don't, we should close them.
         session.setIdleTime(IdleStatus.BOTH_IDLE, 300);
         }
 
     @Override
     public void sessionIdle(final IoSession session, final IdleStatus status)
         {
-        LOG.warn("Killing idle session: {}", session);
+        m_log.warn("Killing idle session: {}", session);
         // Kill idle sessions.
         session.close();
         }
