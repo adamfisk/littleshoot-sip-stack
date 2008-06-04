@@ -23,8 +23,8 @@ public class SipTransactionFactoryImpl implements SipTransactionFactory
      * 
      * @param tracker The class that keeps track of transactions.
      * @param messageFactory The factory for creating SIP messages.
-     * @param t1 The value to use for T1, as speficied in RFC 3261 s
-     * ection 17.1.1.2 on page 126.  T1 is multiplied by 64 to give the 
+     * @param t1 The value to use for T1, as specified in RFC 3261 section 
+     * 17.1.1.2 on page 126.  T1 is multiplied by 64 to give the 
      * timeout for transactions.
      */
     public SipTransactionFactoryImpl(final SipTransactionTracker tracker,

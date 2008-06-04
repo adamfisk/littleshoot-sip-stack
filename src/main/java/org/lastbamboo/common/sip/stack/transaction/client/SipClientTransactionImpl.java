@@ -48,8 +48,8 @@ public class SipClientTransactionImpl implements SipClientTransaction
      * @param transactionListeners The listeners for transaction events.
      * @param messageFactory The factory for creating SIP messages.
      * @param timer The timer to add timer B tasks to.
-     * @param t1 The value to use for T1, as speficied in RFC 3261 s
-     * ection 17.1.1.2 on page 126.  T1 is multiplied by 64 to give the 
+     * @param t1 The value to use for T1, as specified in RFC 3261 section
+     * 17.1.1.2 on page 126.  T1 is multiplied by 64 to give the 
      * timeout for transactions.  The default value is 500, but this can be 
      * modified for testing, for example.
      */
@@ -67,6 +67,7 @@ public class SipClientTransactionImpl implements SipClientTransaction
         // RFC 3261 section 17.1.1.2 on page 125.
         this.m_timerB = new TimerTask()
             {
+            @Override
             public void run()
                 {
                 LOG.warn("Timer B firing!!  The client transaction timed out" +
