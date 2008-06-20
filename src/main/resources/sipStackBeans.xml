@@ -7,7 +7,7 @@
         A factory for creating SIP URIs from user identifiers.
     -->
     <bean id="sipUriFactory"
-          class="org.lastbamboo.common.sip.stack.SipUriFactoryImpl"/>
+        class="org.lastbamboo.common.sip.stack.SipUriFactoryImpl"/>
           
     <!--
         URI utilities.
@@ -26,7 +26,7 @@
         The factory for creating SIP messages.
     -->
     <bean id="sipMessageFactory"
-          class="org.lastbamboo.common.sip.stack.message.SipMessageFactoryImpl">
+        class="org.lastbamboo.common.sip.stack.message.SipMessageFactoryImpl">
         <constructor-arg><ref local="sipHeaderFactory"/></constructor-arg>
         </bean>
 
@@ -42,15 +42,15 @@
     -->
     <bean id="sipTransactionFactory"
           class="org.lastbamboo.common.sip.stack.transaction.client.SipTransactionFactoryImpl">
-    	<constructor-arg><ref local="sipTransactionTracker"/></constructor-arg>
-       	<constructor-arg><ref local="sipMessageFactory"/></constructor-arg>
-       	<constructor-arg><value>500</value></constructor-arg>
+        <constructor-arg><ref local="sipTransactionTracker"/></constructor-arg>
+           <constructor-arg><ref local="sipMessageFactory"/></constructor-arg>
+           <constructor-arg><value>500</value></constructor-arg>
         </bean>
 
-   	<bean id="sipTransportLayer"
+       <bean id="sipTransportLayer"
               class="org.lastbamboo.common.sip.stack.transport.SipTcpTransportLayerImpl">
-   		<constructor-arg><ref local="sipTransactionFactory"/></constructor-arg>
-       	<constructor-arg><ref local="sipHeaderFactory"/></constructor-arg>
-       	<constructor-arg><ref local="sipMessageFactory"/></constructor-arg>
+           <constructor-arg><ref local="sipTransactionFactory"/></constructor-arg>
+           <constructor-arg><ref local="sipHeaderFactory"/></constructor-arg>
+           <constructor-arg><ref local="sipMessageFactory"/></constructor-arg>
         </bean>
     </beans>
