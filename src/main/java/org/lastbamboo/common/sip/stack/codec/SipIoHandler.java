@@ -6,6 +6,7 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.util.SessionUtil;
+import org.lastbamboo.common.sip.stack.IdleSipSessionListener;
 import org.lastbamboo.common.sip.stack.message.SipMessage;
 import org.lastbamboo.common.sip.stack.message.SipMessageVisitor;
 import org.lastbamboo.common.sip.stack.message.SipMessageVisitorFactory;
@@ -24,6 +25,8 @@ public class SipIoHandler extends IoHandlerAdapter
     private final SipMessageVisitorFactory m_visitorFactory;
 
     private static int s_messagesRead = 0;
+
+    private final IdleSipSessionListener m_idleSipSessionListener;
     
     /**
      * Creates a new protocol handler.
@@ -34,9 +37,25 @@ public class SipIoHandler extends IoHandlerAdapter
      */
     public SipIoHandler(final SipMessageVisitorFactory visitorFactory)
         {
-        m_visitorFactory = visitorFactory;
+        this.m_visitorFactory = visitorFactory;
+        this.m_idleSipSessionListener = null;
         }
 
+    /**
+     * Creates a new protocol handler.
+     * 
+     * @param visitorFactory The factory for creating visitors for read 
+     * messages.  Factories might create specialized visitors for clients or
+     * servers, for example.
+     * @param idleSipSessionListener Listener for idle sessions.
+     */
+    public SipIoHandler(final SipMessageVisitorFactory visitorFactory,
+        final IdleSipSessionListener idleSipSessionListener)
+        {
+        m_visitorFactory = visitorFactory;
+        this.m_idleSipSessionListener = idleSipSessionListener;
+        }
+    
     @Override
     public void exceptionCaught(final IoSession session, 
         final Throwable cause) throws Exception
@@ -55,7 +74,7 @@ public class SipIoHandler extends IoHandlerAdapter
         s_messagesRead++;
         if (m_log.isDebugEnabled())
             {
-            m_log.debug("Messages read:{} ", s_messagesRead);
+            m_log.debug("Messages read: {} ", s_messagesRead);
             }
         final SipMessage sipMessage = (SipMessage) message;
         final SipMessageVisitor visitor = 
@@ -96,8 +115,16 @@ public class SipIoHandler extends IoHandlerAdapter
     @Override
     public void sessionIdle(final IoSession session, final IdleStatus status)
         {
-        m_log.warn("Killing idle session: {}", session);
+        // This can happen, for example, if a user puts their laptop to sleep.
+        // When it wakes up, the session will be seen as idle.
+        m_log.debug("Killing idle session: {}", session);
+        
         // Kill idle sessions.
         session.close();
+        
+        if (this.m_idleSipSessionListener != null)
+            {
+            this.m_idleSipSessionListener.onIdleSession();
+            }
         }
     }
