@@ -109,7 +109,10 @@ public class SipIoHandler extends IoHandlerAdapter
         
         // Even though SIP governs online status, clients still send traffic to 
         // keep connections open.  If they don't, we should close them.
-        session.setIdleTime(IdleStatus.BOTH_IDLE, 300);
+        
+        // Note the CRLF keep alive time is 120 or less (it's randomized), so 
+        // we tolerate 2 failures as well as slightly inaccurate timers.
+        session.setIdleTime(IdleStatus.BOTH_IDLE, 260);
         }
 
     @Override
