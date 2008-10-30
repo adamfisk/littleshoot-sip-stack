@@ -74,12 +74,16 @@ public class SipIoHandler extends IoHandlerAdapter
         s_messagesRead++;
         if (m_log.isDebugEnabled())
             {
-            m_log.debug("Messages read: {} ", s_messagesRead);
+            m_log.debug("Received message.  Now read: {} ", s_messagesRead);
             }
         final SipMessage sipMessage = (SipMessage) message;
         final SipMessageVisitor visitor = 
             this.m_visitorFactory.createVisitor(session);
         sipMessage.accept(visitor);
+        if (m_log.isDebugEnabled())
+            {
+            m_log.debug("Message processing complete for: {}", sipMessage);
+            }
         }
     
     @Override
