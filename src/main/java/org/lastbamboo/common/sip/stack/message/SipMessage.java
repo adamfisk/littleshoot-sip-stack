@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.mina.common.ByteBuffer;
 import org.lastbamboo.common.sip.stack.codec.SipMethod;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
+import org.lastbamboo.common.sip.stack.message.header.SipHeaderValue;
 
 /**
  * Interface for a single SIP message.
@@ -47,7 +48,7 @@ public interface SipMessage
      * 
      * @return The list of routes for this message.
      */
-    List getRouteSet();
+    List<SipHeaderValue> getRouteSet();
     
     /**
      * Accessor for the message body.

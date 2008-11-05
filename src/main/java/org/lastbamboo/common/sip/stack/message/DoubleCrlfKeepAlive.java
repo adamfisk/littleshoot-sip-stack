@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.mina.common.ByteBuffer;
 import org.lastbamboo.common.sip.stack.codec.SipMethod;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
+import org.lastbamboo.common.sip.stack.message.header.SipHeaderValue;
 import org.lastbamboo.common.util.StringUtils;
 
 /**
@@ -51,14 +52,13 @@ public class DoubleCrlfKeepAlive implements SipMessage
         return SipMethod.DOUBLE_CRLF_KEEP_ALIVE;
         }
 
-    public List getRouteSet()
+    public List<SipHeaderValue> getRouteSet()
         {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
         }
-
+    
     public String getStartLine()
         {
         return org.apache.commons.lang.StringUtils.EMPTY;
         }
-
     }

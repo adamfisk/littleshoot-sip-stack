@@ -6,8 +6,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -288,8 +288,9 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
         {
         if (LOG.isDebugEnabled())
             {
-            LOG.debug("Wrote messages: "+ 
-                future.getSession().getWrittenMessages());
+            final IoSession sess = future.getSession();
+            LOG.debug("Wrote messages: "+ sess.getWrittenMessages() + 
+                " on session " + sess); 
             }
         }
     
@@ -302,11 +303,10 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
             LOG.warn("Existing connections: "+
                 this.m_socketAddressesToIo);
             final StringBuilder sb = new StringBuilder();
-            final Collection keys = 
+            final Set<InetSocketAddress> keys = 
                 this.m_socketAddressesToIo.keySet();
-            for (final Iterator iter = keys.iterator(); iter.hasNext();)
+            for (final InetSocketAddress sa: keys)
                 {
-                final InetSocketAddress sa = (InetSocketAddress) iter.next();
                 sb.append(sa.toString());
                 sb.append(" code: ");
                 sb.append(sa.hashCode());
