@@ -124,7 +124,7 @@ public class SipMessageEncoderImpl implements SipMessageEncoder
                     {
                     buffer.putString(header.getName(), m_asciiEncoder);
                     buffer.put(MinaCodecUtils.COLON);
-                    buffer.put(MinaCodecUtils.SP);
+                    buffer.put(MinaCodecUtils.SPACE);
                     appendHeaderValues(buffer, values);
                     MinaCodecUtils.appendCRLF(buffer);
                     }

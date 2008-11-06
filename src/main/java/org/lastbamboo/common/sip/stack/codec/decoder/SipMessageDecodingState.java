@@ -80,6 +80,10 @@ public class SipMessageDecodingState extends DecodingStateMachine
         {
         }
     
+    /**
+     * Note this *extends* SipFirstLineDecodingState that does the decoding
+     * of the line.
+     */
     private final class ReadFirstLineState extends SipFirstLineDecodingState
         {
 

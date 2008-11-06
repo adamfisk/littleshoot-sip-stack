@@ -68,7 +68,7 @@ abstract class SipFirstLineDecodingState extends DecodingStateMachine
         
         private MessageTypeDecodingState()
             {
-            super(MinaCodecUtils.SP, MinaCodecUtils.CR);
+            super(MinaCodecUtils.SPACE, MinaCodecUtils.CR);
             }
 
         @Override
@@ -91,7 +91,8 @@ abstract class SipFirstLineDecodingState extends DecodingStateMachine
                 case INVITE:
                     return new ReadRequestUriState();
                 case DOUBLE_CRLF:
-                    return new ReadCrCrlfDecodingState();
+                    // Read the final LF CR LF
+                    return new ReadLfCrlfDecodingState();
                 case UNKNOWN:
                     // Maybe it's a method we don't know about?  Assume it's
                     // some sort of request and process it as such.
@@ -128,14 +129,15 @@ abstract class SipFirstLineDecodingState extends DecodingStateMachine
             }
         };
     
-    private final class ReadCrCrlfDecodingState 
+    private final class ReadLfCrlfDecodingState 
         extends ConsumeToCrlfDecodingState
         {
         @Override
         protected DecodingState finishDecode(final ByteBuffer product,
             final ProtocolDecoderOutput out) throws Exception
             {
-            // Read the final CRCRLF sequence of a CRLFCRLF keep-alive message.
+            // Read the final LFCRLF sequence of a CRLFCRLF keep-alive message.
+            LOG.debug("Read final LF CR LF");
             return null;
             }
         };
