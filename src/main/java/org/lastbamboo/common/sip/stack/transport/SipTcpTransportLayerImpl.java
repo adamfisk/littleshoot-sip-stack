@@ -213,7 +213,7 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
             }
         }
     
-    public void writeCrlfKeepAlive(final IoSession io)
+    public WriteFuture writeCrlfKeepAlive(final IoSession io)
         {
         if (LOG.isDebugEnabled())
             {
@@ -228,10 +228,10 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
         catch (final UnsupportedEncodingException e)
             {
             LOG.error("Bad encoding??", e);
-            return;
+            return null;
             }
 
-        io.write(buf);
+        return io.write(buf);
         }
 
     public void writeResponse(final SipResponse response) throws IOException

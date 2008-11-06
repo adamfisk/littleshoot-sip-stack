@@ -5,6 +5,7 @@ import java.net.InetSocketAddress;
 import java.util.Collection;
 
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.WriteFuture;
 import org.lastbamboo.common.sip.stack.message.Invite;
 import org.lastbamboo.common.sip.stack.message.Register;
 import org.lastbamboo.common.sip.stack.message.SipResponse;
@@ -112,8 +113,9 @@ public interface SipTcpTransportLayer
      * connections have been closed.
      * 
      * @param io The reader/writer to write the messages over.
+     * @return The future for the write.
      */
-    void writeCrlfKeepAlive(IoSession io);
+    WriteFuture writeCrlfKeepAlive(IoSession io);
 
     /**
      * Removes this connection.
