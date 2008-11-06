@@ -3,7 +3,7 @@ package org.lastbamboo.common.sip.stack.codec;
 import java.io.IOException;
 
 import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoHandlerAdapter;
+import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.util.SessionUtil;
 import org.lastbamboo.common.sip.stack.IdleSipSessionListener;
@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Protocol handler for SIP messages.
  */
-public class SipIoHandler extends IoHandlerAdapter
+public class SipIoHandler implements IoHandler
     {
 
     private final Logger m_log = 
@@ -56,7 +56,6 @@ public class SipIoHandler extends IoHandlerAdapter
         this.m_idleSipSessionListener = idleSipSessionListener;
         }
     
-    @Override
     public void exceptionCaught(final IoSession session, 
         final Throwable cause) throws Exception
         {
@@ -67,7 +66,6 @@ public class SipIoHandler extends IoHandlerAdapter
         session.close();
         }
 
-    @Override
     public final void messageReceived(final IoSession session, 
         final Object message) throws Exception
         {
@@ -86,23 +84,22 @@ public class SipIoHandler extends IoHandlerAdapter
             }
         }
     
-    @Override
     public void messageSent(final IoSession session, final Object message) 
         throws Exception
         {
+        m_log.debug("Message sent to: {}", session.getRemoteAddress());
         }
 
-    @Override
     public void sessionOpened(final IoSession session) throws Exception
         {
+        m_log.debug("Session opened!!!");
         }
     
-    @Override
     public void sessionClosed(final IoSession session) throws Exception
         {
+        m_log.debug("Session closed!!!");
         }
 
-    @Override
     public void sessionCreated(final IoSession session) throws Exception
         {
         SessionUtil.initialize(session);
@@ -119,7 +116,6 @@ public class SipIoHandler extends IoHandlerAdapter
         session.setIdleTime(IdleStatus.BOTH_IDLE, 260);
         }
 
-    @Override
     public void sessionIdle(final IoSession session, final IdleStatus status)
         {
         // This can happen, for example, if a user puts their laptop to sleep.
