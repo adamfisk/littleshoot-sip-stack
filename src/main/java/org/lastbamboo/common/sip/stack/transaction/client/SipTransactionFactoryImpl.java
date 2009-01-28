@@ -32,7 +32,7 @@ public class SipTransactionFactoryImpl implements SipTransactionFactory
         {
         this.m_transactionTracker = tracker;
         this.m_messageFactory = messageFactory;
-        this.m_timerBThread = new Timer(true);
+        this.m_timerBThread = new Timer("SIP-TimerB-Thread", true);
         this.m_t1 = t1;
         }
     
