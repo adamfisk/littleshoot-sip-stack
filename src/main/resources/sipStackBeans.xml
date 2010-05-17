@@ -5,41 +5,26 @@
 
     <!--
         A factory for creating SIP URIs from user identifiers.
-    -->
+    
     <bean lazy-init="true" id="sipUriFactory"
         class="org.lastbamboo.common.sip.stack.SipUriFactoryImpl"/>
           
-    <!--
-        URI utilities.
-    -->
     <bean lazy-init="true" id="uriUtils" class="org.lastbamboo.common.sip.stack.util.UriUtilsImpl">
         </bean>
 
-    <!--
-        The factory for creating SIP message headers.
-    -->
     <bean lazy-init="true" id="sipHeaderFactory"
           class="org.lastbamboo.common.sip.stack.message.header.SipHeaderFactoryImpl">
         </bean>
 
-    <!--
-        The factory for creating SIP messages.
-    -->
     <bean lazy-init="true" id="sipMessageFactory"
         class="org.lastbamboo.common.sip.stack.message.SipMessageFactoryImpl">
         <constructor-arg><ref local="sipHeaderFactory"/></constructor-arg>
         </bean>
 
-    <!--
-        The factory for creating SIP transactions.
-    -->
     <bean lazy-init="true" id="sipTransactionTracker"
           class="org.lastbamboo.common.sip.stack.transaction.client.SipTransactionTrackerImpl">
         </bean>
 
-    <!--
-        The factory for creating SIP transactions.
-    -->
     <bean lazy-init="true" id="sipTransactionFactory"
           class="org.lastbamboo.common.sip.stack.transaction.client.SipTransactionFactoryImpl">
         <constructor-arg><ref local="sipTransactionTracker"/></constructor-arg>
@@ -53,4 +38,5 @@
         <constructor-arg><ref local="sipHeaderFactory"/></constructor-arg>
         <constructor-arg><ref local="sipMessageFactory"/></constructor-arg>
         </bean>
+        -->
     </beans>
