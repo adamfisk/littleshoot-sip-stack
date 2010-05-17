@@ -1,12 +1,12 @@
 package org.lastbamboo.common.sip.stack.codec.encoder;
 
-import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.IoFuture;
-import org.apache.mina.common.IoFutureListener;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.WriteFuture;
-import org.apache.mina.filter.codec.ProtocolEncoder;
-import org.apache.mina.filter.codec.ProtocolEncoderOutput;
+import org.littleshoot.mina.common.ByteBuffer;
+import org.littleshoot.mina.common.IoFuture;
+import org.littleshoot.mina.common.IoFutureListener;
+import org.littleshoot.mina.common.IoSession;
+import org.littleshoot.mina.common.WriteFuture;
+import org.littleshoot.mina.filter.codec.ProtocolEncoder;
+import org.littleshoot.mina.filter.codec.ProtocolEncoderOutput;
 import org.lastbamboo.common.sip.stack.message.SipMessage;
 import org.lastbamboo.common.util.mina.MinaUtils;
 import org.slf4j.Logger;

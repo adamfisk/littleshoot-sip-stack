@@ -1,6 +1,6 @@
 package org.lastbamboo.common.sip.stack.message;
 
-import org.apache.mina.common.IoSession;
+import org.littleshoot.mina.common.IoSession;
 
 /**
  * Factory for creating SIP message visitors.  Implementing classes might

@@ -1,8 +1,8 @@
 package org.lastbamboo.common.sip.stack.codec;
 
-import org.apache.mina.filter.codec.ProtocolCodecFactory;
-import org.apache.mina.filter.codec.ProtocolDecoder;
-import org.apache.mina.filter.codec.ProtocolEncoder;
+import org.littleshoot.mina.filter.codec.ProtocolCodecFactory;
+import org.littleshoot.mina.filter.codec.ProtocolDecoder;
+import org.littleshoot.mina.filter.codec.ProtocolEncoder;
 import org.lastbamboo.common.sip.stack.codec.decoder.SipMessageDecodingState;
 import org.lastbamboo.common.sip.stack.codec.encoder.SipMessageProtocolEncoder;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;

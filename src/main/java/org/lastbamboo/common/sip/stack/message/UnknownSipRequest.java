@@ -3,7 +3,7 @@ package org.lastbamboo.common.sip.stack.message;
 import java.net.URI;
 import java.util.Map;
 
-import org.apache.mina.common.ByteBuffer;
+import org.littleshoot.mina.common.ByteBuffer;
 import org.lastbamboo.common.sip.stack.codec.SipMethod;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 

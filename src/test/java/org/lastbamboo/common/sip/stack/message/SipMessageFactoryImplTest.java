@@ -10,7 +10,7 @@ import junit.framework.TestCase;
 import org.apache.commons.id.uuid.UUID;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.mina.common.ByteBuffer;
+import org.littleshoot.mina.common.ByteBuffer;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactoryImpl;

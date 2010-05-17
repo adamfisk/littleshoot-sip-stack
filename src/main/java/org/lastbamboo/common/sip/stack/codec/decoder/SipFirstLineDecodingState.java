@@ -6,8 +6,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.filter.codec.ProtocolDecoderOutput;
+import org.littleshoot.mina.common.ByteBuffer;
+import org.littleshoot.mina.filter.codec.ProtocolDecoderOutput;
 import org.lastbamboo.common.sip.stack.codec.SipMessageType;
 import org.lastbamboo.common.util.mina.ConsumeToCrlfDecodingState;
 import org.lastbamboo.common.util.mina.ConsumeToLinearWhitespaceDecodingState;

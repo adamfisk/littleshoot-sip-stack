@@ -4,9 +4,9 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.SimpleByteBufferAllocator;
-import org.apache.mina.filter.codec.ProtocolDecoderOutput;
+import org.littleshoot.mina.common.ByteBuffer;
+import org.littleshoot.mina.common.SimpleByteBufferAllocator;
+import org.littleshoot.mina.filter.codec.ProtocolDecoderOutput;
 import org.lastbamboo.common.sip.stack.codec.SipMessageType;
 import org.lastbamboo.common.sip.stack.message.DoubleCrlfKeepAlive;
 import org.lastbamboo.common.sip.stack.message.SingleSipMessageFactory;

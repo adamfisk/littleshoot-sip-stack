@@ -5,8 +5,8 @@ import java.nio.charset.CharsetDecoder;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.filter.codec.ProtocolDecoderOutput;
+import org.littleshoot.mina.common.ByteBuffer;
+import org.littleshoot.mina.filter.codec.ProtocolDecoderOutput;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
 import org.lastbamboo.common.util.mina.ConsumeToCrlfDecodingState;

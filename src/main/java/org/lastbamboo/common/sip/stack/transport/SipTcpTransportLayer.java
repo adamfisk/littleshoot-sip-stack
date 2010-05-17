@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Collection;
 
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.WriteFuture;
+import org.littleshoot.mina.common.IoSession;
+import org.littleshoot.mina.common.WriteFuture;
 import org.lastbamboo.common.sip.stack.message.Invite;
 import org.lastbamboo.common.sip.stack.message.Register;
 import org.lastbamboo.common.sip.stack.message.SipResponse;

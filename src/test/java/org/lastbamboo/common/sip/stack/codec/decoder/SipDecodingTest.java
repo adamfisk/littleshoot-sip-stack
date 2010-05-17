@@ -7,10 +7,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.id.uuid.UUID;
-import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.SimpleByteBufferAllocator;
-import org.apache.mina.filter.codec.ProtocolDecoder;
-import org.apache.mina.filter.codec.ProtocolDecoderOutput;
+import org.littleshoot.mina.common.ByteBuffer;
+import org.littleshoot.mina.common.SimpleByteBufferAllocator;
+import org.littleshoot.mina.filter.codec.ProtocolDecoder;
+import org.littleshoot.mina.filter.codec.ProtocolDecoderOutput;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
-import org.apache.mina.common.IoSession;
+import org.littleshoot.mina.common.IoSession;
 import org.junit.Test;
 import org.lastbamboo.common.sip.stack.message.SipMessageFactory;
 import org.lastbamboo.common.sip.stack.message.SipMessageFactoryImpl;

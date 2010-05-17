@@ -3,7 +3,7 @@ package org.lastbamboo.common.sip.stack.stubs;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.mina.common.ByteBuffer;
+import org.littleshoot.mina.common.ByteBuffer;
 import org.lastbamboo.common.sip.stack.message.SipResponse;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
