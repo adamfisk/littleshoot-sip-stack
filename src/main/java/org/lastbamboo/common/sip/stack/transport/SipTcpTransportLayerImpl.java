@@ -11,8 +11,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.littleshoot.mina.common.ByteBuffer;
 import org.littleshoot.mina.common.IoFuture;
 import org.littleshoot.mina.common.IoFutureListener;
@@ -38,8 +38,7 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
     IoFutureListener
     {
 
-    private static final Log LOG = 
-        LogFactory.getLog(SipTcpTransportLayerImpl.class);
+    private final Logger LOG = LoggerFactory.getLogger(SipTcpTransportLayerImpl.class);
     
     /**
      * Map of InetSocketAddresses to IoSessions.

@@ -4,8 +4,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.lastbamboo.common.sip.stack.codec.SipMethod;
 import org.lastbamboo.common.sip.stack.message.SipMessage;
 
@@ -16,8 +16,7 @@ public class SipTransactionTrackerImpl implements SipTransactionTracker,
     SipTransactionListener
     {
     
-    private static final Log LOG = 
-        LogFactory.getLog(SipTransactionTrackerImpl.class);
+    private final Logger LOG = LoggerFactory.getLogger(SipTransactionTrackerImpl.class);
     
     private final Map<String, SipClientTransaction> m_transactions = 
         new ConcurrentHashMap<String, SipClientTransaction>();

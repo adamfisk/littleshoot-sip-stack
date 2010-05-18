@@ -3,8 +3,8 @@ package org.lastbamboo.common.sip.stack.message;
 import java.net.URI;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.littleshoot.mina.common.ByteBuffer;
 import org.lastbamboo.common.sip.stack.codec.SipMethod;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
@@ -18,7 +18,7 @@ public class Invite extends AbstractSipMessage
     /**
      * Logger for this class.
      */
-    private static final Log LOG = LogFactory.getLog(Invite.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Invite.class);
     
     /**
      * Creates a new INVITE request with the specified first line of the 

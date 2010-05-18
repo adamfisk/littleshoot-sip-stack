@@ -3,8 +3,8 @@ package org.lastbamboo.common.sip.stack.message.header;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Bean for a single SIP header.
@@ -12,7 +12,7 @@ import org.apache.commons.logging.LogFactory;
 public class SipHeaderImpl implements SipHeader
     {
 
-    private static final Log LOG = LogFactory.getLog(SipHeaderImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SipHeaderImpl.class);
     
     private final String m_headerName;
     private final List<SipHeaderValue> m_headerValues;

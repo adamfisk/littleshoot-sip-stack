@@ -11,8 +11,8 @@ import java.util.Map;
 
 import org.apache.commons.id.uuid.UUID;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.lastbamboo.common.util.RuntimeIoException;
 
 /**
@@ -21,8 +21,7 @@ import org.lastbamboo.common.util.RuntimeIoException;
 public class SipHeaderFactoryImpl implements SipHeaderFactory
     {
 
-    private static final Log LOG = 
-        LogFactory.getLog(SipHeaderFactoryImpl.class);
+    private final Logger LOG = LoggerFactory.getLogger(SipHeaderFactoryImpl.class);
     
     private static int sequenceNumber = 1;
     

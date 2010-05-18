@@ -3,8 +3,8 @@ package org.lastbamboo.common.sip.stack.message;
 import java.net.URI;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.littleshoot.mina.common.ByteBuffer;
 import org.lastbamboo.common.sip.stack.codec.SipMethod;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
@@ -15,7 +15,7 @@ import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 public class Register extends AbstractSipMessage
     {
 
-    private static final Log LOG = LogFactory.getLog(Register.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Register.class);
     
     /**
      * Creates a new register request.

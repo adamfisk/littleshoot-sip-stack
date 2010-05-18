@@ -4,8 +4,8 @@ import java.net.URI;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test for the UriUtils class.
@@ -13,7 +13,7 @@ import org.apache.commons.logging.LogFactory;
 public class UriUtilsImplTest extends TestCase
     {
 
-    private static final Log LOG = LogFactory.getLog(UriUtilsImplTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UriUtilsImplTest.class);
     
     /**
      * Tests the method for extracting the port from a SIP URI.

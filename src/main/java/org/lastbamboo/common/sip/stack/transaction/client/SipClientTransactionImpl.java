@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.lastbamboo.common.sip.stack.message.DoubleCrlfKeepAlive;
 import org.lastbamboo.common.sip.stack.message.Invite;
 import org.lastbamboo.common.sip.stack.message.Register;
@@ -21,8 +21,7 @@ import org.lastbamboo.common.sip.stack.message.UnknownSipRequest;
 public class SipClientTransactionImpl implements SipClientTransaction
     {
     
-    private static final Log LOG = 
-        LogFactory.getLog(SipClientTransactionImpl.class);
+    private final Logger LOG = LoggerFactory.getLogger(SipClientTransactionImpl.class);
     
     private final SipMessage m_request;
 

@@ -6,8 +6,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of the URI utilities interface.
@@ -17,7 +17,7 @@ public class UriUtilsImpl implements UriUtils
     /**
      * The log for this class.
      */
-    private static final Log LOG = LogFactory.getLog (UriUtilsImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger (UriUtilsImpl.class);
     
     private final String m_sipUriPortRegex = 
         "[sips:|sip:]\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:(\\d+)";

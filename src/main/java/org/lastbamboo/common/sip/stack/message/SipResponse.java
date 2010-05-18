@@ -2,8 +2,8 @@ package org.lastbamboo.common.sip.stack.message;
 
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.littleshoot.mina.common.ByteBuffer;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 
@@ -13,7 +13,7 @@ import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 public class SipResponse extends AbstractSipMessage
     {
 
-    private static final Log LOG = LogFactory.getLog(SipResponse.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SipResponse.class);
     private final int m_statusCode;
     private final String m_reasonPhrase;
     

@@ -9,8 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.id.uuid.UUID;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.littleshoot.mina.common.ByteBuffer;
 import org.littleshoot.mina.common.SimpleByteBufferAllocator;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
@@ -32,8 +32,7 @@ public class SipMessageFactoryImpl implements SipMessageFactory
     /**
      * Logger for this class.
      */
-    private static final Log LOG = 
-        LogFactory.getLog(SipMessageFactoryImpl.class);
+    private final Logger LOG = LoggerFactory.getLogger(SipMessageFactoryImpl.class);
 
     private final SipHeaderFactory m_headerFactory;
     

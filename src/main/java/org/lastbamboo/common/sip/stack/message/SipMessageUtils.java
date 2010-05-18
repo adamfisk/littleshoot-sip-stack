@@ -18,8 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderImpl;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderNames;
@@ -33,7 +33,7 @@ import org.lastbamboo.common.sip.stack.message.header.SipHeaderValueImpl;
 public class SipMessageUtils
     {
 
-    private static final Log LOG = LogFactory.getLog(SipMessageUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SipMessageUtils.class);
     
     private SipMessageUtils()
         {
