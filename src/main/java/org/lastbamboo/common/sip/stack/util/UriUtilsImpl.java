@@ -24,8 +24,7 @@ public class UriUtilsImpl implements UriUtils
     private final Pattern m_sipUriPortPattern = 
         Pattern.compile(m_sipUriPortRegex);
     
-    public java.net.URI getUri
-            (final String uriString)
+    public java.net.URI getUri (final String uriString)
         {
         try
             {
@@ -37,8 +36,7 @@ public class UriUtilsImpl implements UriUtils
             }
         }
 
-    public java.net.URI getUriForHost
-            (String host)
+    public java.net.URI getUriForHost (final String host)
         {
         try
             {
@@ -50,10 +48,9 @@ public class UriUtilsImpl implements UriUtils
             }
         }
 
-    public java.net.URI getSipUri
-            (final String host)
+    public java.net.URI getSipUri (final String host)
         {
-        final StringBuffer buffer = new StringBuffer ();
+        final StringBuilder buffer = new StringBuilder ();
 
         buffer.append ("sip:");
         buffer.append (host);
@@ -68,11 +65,9 @@ public class UriUtilsImpl implements UriUtils
             }
         }
 
-    public java.net.URI getSipUri
-            (final String host,
-             final int port)
+    public java.net.URI getSipUri (final String host, final int port)
         {
-        final StringBuffer buffer = new StringBuffer ();
+        final StringBuilder buffer = new StringBuilder ();
 
         buffer.append ("sip:");
         buffer.append (host);
@@ -89,12 +84,10 @@ public class UriUtilsImpl implements UriUtils
             }
         }
 
-    public java.net.URI getSipUri
-            (final String host,
-             final int port,
-             final String transport)
+    public java.net.URI getSipUri (final String host, final int port,
+        final String transport)
         {
-        final StringBuffer buffer = new StringBuffer ();
+        final StringBuilder buffer = new StringBuilder ();
 
         buffer.append ("sip:");
         buffer.append (host);
@@ -113,9 +106,8 @@ public class UriUtilsImpl implements UriUtils
             throw (new RuntimeException (uriSyntaxException));
             }
         }
-    public java.net.URI getUriWithPort
-            (final java.net.URI uri,
-             final int port)
+    
+    public java.net.URI getUriWithPort(final java.net.URI uri, final int port)
         {
         try
             {
@@ -133,8 +125,7 @@ public class UriUtilsImpl implements UriUtils
             }
         }
     
-    public String getUserInSipUri
-            (final java.net.URI sipUri)
+    public String getUserInSipUri(final java.net.URI sipUri)
         {
         if (LOG.isDebugEnabled())
             {
@@ -144,8 +135,7 @@ public class UriUtilsImpl implements UriUtils
         return StringUtils.substringBetween(sipUriString, "sip:", "@");
         }
     
-    public String getHostInSipUri
-            (final java.net.URI sipUri)
+    public String getHostInSipUri(final java.net.URI sipUri)
         {
         final String uri = sipUri.toASCIIString();
         LOG.debug("Parsing URI string: "+uri);
@@ -174,8 +164,7 @@ public class UriUtilsImpl implements UriUtils
         return StringUtils.substringAfterLast(uri, "@");
         }
 
-    public int getPersonIdInSipUri
-            (final java.net.URI sipUri)
+    public int getPersonIdInSipUri(final java.net.URI sipUri)
         {
         if (LOG.isDebugEnabled())
             {
