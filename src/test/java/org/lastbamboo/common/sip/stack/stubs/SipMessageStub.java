@@ -62,4 +62,9 @@ public class SipMessageStub implements SipMessage
         // TODO Auto-generated method stub
         return null;
         }
+
+    public String getTransactionKey() {
+        // TODO Auto-generated method stub
+        return null;
+    }
     }

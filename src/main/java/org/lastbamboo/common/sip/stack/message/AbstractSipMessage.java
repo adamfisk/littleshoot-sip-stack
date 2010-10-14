@@ -168,6 +168,13 @@ public abstract class AbstractSipMessage implements SipMessage
         return this.m_startLine;
         }
 
+    public String getTransactionKey()
+        {
+        final String branchId = getBranchId();
+        final SipMethod method = getMethod();
+        return branchId + method.toString();
+        }
+
     @Override
     public String toString()
         {

@@ -18,6 +18,7 @@ import org.littleshoot.mina.common.IoFuture;
 import org.littleshoot.mina.common.IoFutureListener;
 import org.littleshoot.mina.common.IoSession;
 import org.littleshoot.mina.common.WriteFuture;
+import org.lastbamboo.common.offer.answer.OfferAnswerTransactionListener;
 import org.lastbamboo.common.sip.stack.message.Invite;
 import org.lastbamboo.common.sip.stack.message.Register;
 import org.lastbamboo.common.sip.stack.message.SipMessage;
@@ -28,7 +29,6 @@ import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
 import org.lastbamboo.common.sip.stack.transaction.client.SipClientTransaction;
 import org.lastbamboo.common.sip.stack.transaction.client.SipTransactionFactory;
-import org.lastbamboo.common.sip.stack.transaction.client.SipTransactionListener;
 import org.lastbamboo.common.util.NetworkUtils;
 
 /**
@@ -38,7 +38,7 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
     IoFutureListener
     {
 
-    private final Logger LOG = LoggerFactory.getLogger(SipTcpTransportLayerImpl.class);
+    private final Logger LOG = LoggerFactory.getLogger(getClass());
     
     /**
      * Map of InetSocketAddresses to IoSessions.
@@ -92,7 +92,7 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
         }
     
     public SipClientTransaction invite(final Invite request, 
-        final IoSession io, final SipTransactionListener transactionListener)
+        final IoSession io, final OfferAnswerTransactionListener transactionListener)
         {
         if (LOG.isDebugEnabled())
             {
@@ -120,7 +120,7 @@ public final class SipTcpTransportLayerImpl implements SipTcpTransportLayer,
         }
     
     public SipClientTransaction register(final Register request, 
-        final IoSession io, final SipTransactionListener transactionListener)
+        final IoSession io, final OfferAnswerTransactionListener transactionListener)
         {
         if (LOG.isDebugEnabled())
             {

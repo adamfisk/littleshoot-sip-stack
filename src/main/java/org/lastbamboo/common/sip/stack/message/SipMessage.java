@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.littleshoot.mina.common.ByteBuffer;
+import org.lastbamboo.common.offer.answer.OfferAnswerMessage;
 import org.lastbamboo.common.sip.stack.codec.SipMethod;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderValue;
@@ -11,7 +12,7 @@ import org.lastbamboo.common.sip.stack.message.header.SipHeaderValue;
 /**
  * Interface for a single SIP message.
  */
-public interface SipMessage
+public interface SipMessage extends OfferAnswerMessage
     {
 
     /**
@@ -27,13 +28,6 @@ public interface SipMessage
      * @return The method of the message.
      */
     SipMethod getMethod();
-    
-    /**
-     * Accessor for the complete message bytes.
-     * 
-     * @return The complete message bytes.
-     */
-    //ByteBuffer getBytes();
 
     /**
      * Accessor for the complete header with the specified name.
@@ -56,14 +50,6 @@ public interface SipMessage
      * @return The message body.
      */
     ByteBuffer getBody();
-
-    /**
-     * Accessor for the total length of the message including both the headers
-     * and the message body.
-     * 
-     * @return The length of the message.
-     */
-    //int getTotalLength();
     
     /**
      * Accepts the specified message visitor.
@@ -88,4 +74,5 @@ public interface SipMessage
      * @return All headers in the message.
      */
     Map<String, SipHeader> getHeaders();
+    
     }

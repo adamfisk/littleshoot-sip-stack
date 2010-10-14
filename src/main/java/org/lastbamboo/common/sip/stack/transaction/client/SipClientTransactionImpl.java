@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.lastbamboo.common.offer.answer.OfferAnswerMessage;
+import org.lastbamboo.common.offer.answer.OfferAnswerTransactionListener;
 import org.lastbamboo.common.sip.stack.message.DoubleCrlfKeepAlive;
 import org.lastbamboo.common.sip.stack.message.Invite;
 import org.lastbamboo.common.sip.stack.message.Register;
@@ -14,6 +14,8 @@ import org.lastbamboo.common.sip.stack.message.SipMessage;
 import org.lastbamboo.common.sip.stack.message.SipMessageFactory;
 import org.lastbamboo.common.sip.stack.message.SipResponse;
 import org.lastbamboo.common.sip.stack.message.UnknownSipRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of a SIP client transaction.
@@ -27,7 +29,7 @@ public class SipClientTransactionImpl implements SipClientTransaction
 
     private long m_transactionTime = Long.MAX_VALUE;
 
-    private final List<SipTransactionListener> m_transactionListeners;
+    private final List<OfferAnswerTransactionListener> m_transactionListeners;
 
     private final long m_transactionStartTime;
 
@@ -53,7 +55,7 @@ public class SipClientTransactionImpl implements SipClientTransaction
      * modified for testing, for example.
      */
     public SipClientTransactionImpl(final SipMessage request, 
-        final List<SipTransactionListener> transactionListeners, 
+        final List<OfferAnswerTransactionListener> transactionListeners, 
         final SipMessageFactory messageFactory,
         final Timer timer, final int t1)
         {
@@ -72,7 +74,7 @@ public class SipClientTransactionImpl implements SipClientTransaction
                 LOG.warn("Timer B firing!!  The client transaction timed out" +
                     " for request: " + m_request);
                 m_timerBFired = true;
-                final SipMessage timeout = 
+                final SipResponse timeout = 
                     m_messageFactory.createRequestTimeoutResponse(m_request);
                 notifyListenersOfFailure(timeout);
                 }
@@ -81,7 +83,7 @@ public class SipClientTransactionImpl implements SipClientTransaction
         timer.schedule(this.m_timerB, 64 * t1);
         }
     
-    public void addListener(final SipTransactionListener listener)
+    public void addListener(final OfferAnswerTransactionListener listener)
         {
         this.m_transactionListeners.add(listener);
         }
@@ -116,7 +118,7 @@ public class SipClientTransactionImpl implements SipClientTransaction
                 {
                 LOG.debug("Transaction time: "+getTransactionTime());
                 }
-            for (final SipTransactionListener listener : 
+            for (final OfferAnswerTransactionListener listener : 
                 this.m_transactionListeners)
                 {
                 listener.onTransactionSucceeded(response);
@@ -141,10 +143,10 @@ public class SipClientTransactionImpl implements SipClientTransaction
         notifyListenersOfFailure(response);
         }
 
-    private void notifyListenersOfFailure(final SipMessage response)
+    private void notifyListenersOfFailure(final OfferAnswerMessage response)
         {
         setTransactionTime();
-        for (final SipTransactionListener listener : 
+        for (final OfferAnswerTransactionListener listener : 
             this.m_transactionListeners)
             {
             listener.onTransactionFailed(response);

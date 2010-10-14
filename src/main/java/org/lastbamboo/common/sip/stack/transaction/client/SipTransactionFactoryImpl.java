@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
 
+import org.lastbamboo.common.offer.answer.OfferAnswerTransactionListener;
 import org.lastbamboo.common.sip.stack.message.SipMessage;
 import org.lastbamboo.common.sip.stack.message.SipMessageFactory;
 
@@ -37,10 +38,10 @@ public class SipTransactionFactoryImpl implements SipTransactionFactory
         }
     
     public SipClientTransaction createClientTransaction(
-        final SipMessage request, final SipTransactionListener listener)
+        final SipMessage request, final OfferAnswerTransactionListener listener)
         {
-        final List<SipTransactionListener> transactionListeners = 
-            new LinkedList<SipTransactionListener>();
+        final List<OfferAnswerTransactionListener> transactionListeners = 
+            new LinkedList<OfferAnswerTransactionListener>();
         transactionListeners.add(listener);
         
         final SipClientTransaction ct = 

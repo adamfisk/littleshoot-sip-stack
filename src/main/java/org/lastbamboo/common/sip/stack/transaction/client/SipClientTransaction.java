@@ -1,5 +1,6 @@
 package org.lastbamboo.common.sip.stack.transaction.client;
 
+import org.lastbamboo.common.offer.answer.OfferAnswerTransactionListener;
 import org.lastbamboo.common.sip.stack.message.SipMessage;
 import org.lastbamboo.common.sip.stack.message.SipMessageVisitor;
 
@@ -30,6 +31,6 @@ public interface SipClientTransaction extends SipMessageVisitor
      * 
      * @param listener The listener to add.
      */
-    void addListener(SipTransactionListener listener);
+    void addListener(OfferAnswerTransactionListener listener);
 
     }

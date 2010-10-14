@@ -1,5 +1,6 @@
 package org.lastbamboo.common.sip.stack.transaction.client;
 
+import org.lastbamboo.common.offer.answer.OfferAnswerTransactionListener;
 import org.lastbamboo.common.sip.stack.message.SipMessage;
 
 
@@ -16,7 +17,7 @@ public interface SipTransactionFactory
      * @param transactionListener The listener for transaction events.
      * @return The new client transaction.
      */
-    SipClientTransaction createClientTransaction(final SipMessage request, 
-        final SipTransactionListener transactionListener);
+    SipClientTransaction createClientTransaction(SipMessage request, 
+        OfferAnswerTransactionListener transactionListener);
 
     }

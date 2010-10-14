@@ -6,11 +6,11 @@ import java.util.Collection;
 
 import org.littleshoot.mina.common.IoSession;
 import org.littleshoot.mina.common.WriteFuture;
+import org.lastbamboo.common.offer.answer.OfferAnswerTransactionListener;
 import org.lastbamboo.common.sip.stack.message.Invite;
 import org.lastbamboo.common.sip.stack.message.Register;
 import org.lastbamboo.common.sip.stack.message.SipResponse;
 import org.lastbamboo.common.sip.stack.transaction.client.SipClientTransaction;
-import org.lastbamboo.common.sip.stack.transaction.client.SipTransactionListener;
 
 /**
  * Interface for calls to the TCP transport layer, as specified in section
@@ -39,7 +39,7 @@ public interface SipTcpTransportLayer
      * @return The client transaction for the request.
      */
     SipClientTransaction register(Register message, 
-        IoSession io, SipTransactionListener listener);
+        IoSession io, OfferAnswerTransactionListener listener);
 
     /**
      * Writes a message that is a part of a transaction.  This method should
@@ -53,7 +53,7 @@ public interface SipTcpTransportLayer
      * @return The client transaction for the request.
      */
     SipClientTransaction invite(Invite message, 
-        IoSession io, SipTransactionListener listener);
+        IoSession io, OfferAnswerTransactionListener listener);
 
     /**
      * Writes the specified request without creating a transaction.

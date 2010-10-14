@@ -61,4 +61,11 @@ public class DoubleCrlfKeepAlive implements SipMessage
         {
         return org.apache.commons.lang.StringUtils.EMPTY;
         }
+
+    public String getTransactionKey()
+        {
+        final String branchId = getBranchId();
+        final SipMethod method = getMethod();
+        return branchId + method.toString();
+        }
     }
