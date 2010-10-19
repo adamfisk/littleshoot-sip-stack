@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 public class SipClientTransactionImpl implements SipClientTransaction
     {
     
-    private final Logger LOG = LoggerFactory.getLogger(SipClientTransactionImpl.class);
+    private final Logger m_log = LoggerFactory.getLogger(getClass());
     
     private final SipMessage m_request;
 
@@ -71,7 +71,7 @@ public class SipClientTransactionImpl implements SipClientTransaction
             @Override
             public void run()
                 {
-                LOG.warn("Timer B firing!!  The client transaction timed out" +
+                m_log.warn("Timer B firing!!  The client transaction timed out" +
                     " for request: " + m_request);
                 m_timerBFired = true;
                 final SipResponse timeout = 
@@ -100,23 +100,23 @@ public class SipClientTransactionImpl implements SipClientTransaction
     
     public void visitResponse(final SipResponse response)
         {
-        LOG.debug("SIP client transaction visiting response...");
+        m_log.debug("SIP client transaction visiting response...");
         if (this.m_timerBFired)
             {
-            LOG.warn("Received response after timer B fired!!");
+            m_log.warn("Received response after timer B fired!!");
             return;
             }
         
-        LOG.debug("Canceling TIMER B");
+        m_log.debug("Canceling TIMER B");
         // Tell timer B not to fire.
         this.m_timerB.cancel();
         
         if (response.getStatusCode() == 200)
             {
             setTransactionTime();
-            if (LOG.isDebugEnabled())
+            if (m_log.isDebugEnabled())
                 {
-                LOG.debug("Transaction time: "+getTransactionTime());
+                m_log.debug("Transaction time: "+getTransactionTime());
                 }
             for (final OfferAnswerTransactionListener listener : 
                 this.m_transactionListeners)
@@ -126,7 +126,7 @@ public class SipClientTransactionImpl implements SipClientTransaction
             }
         else
             {
-            LOG.warn("Received non OK response: "+response.getStatusCode());
+            m_log.warn("Received non OK response: "+response.getStatusCode());
             }
         }
 
@@ -134,7 +134,7 @@ public class SipClientTransactionImpl implements SipClientTransaction
         {
         if (this.m_timerBFired)
             {
-            LOG.warn("Received OK after timer B fired!!");
+            m_log.warn("Received OK after timer B fired!!");
             return;
             }
         
@@ -161,23 +161,23 @@ public class SipClientTransactionImpl implements SipClientTransaction
 
     public void visitInvite(final Invite invite)
         {
-        LOG.warn("Should not receive invites on client transactions: "+invite);
+        m_log.warn("Should not receive invites on client transactions: "+invite);
         }
 
     public void visitRegister(final Register register)
         {
-        LOG.warn("Should not receive registers on client transactions: " + 
+        m_log.warn("Should not receive registers on client transactions: " + 
             register);
         }
 
     public void visitUnknownRequest(final UnknownSipRequest request)
         {
-        LOG.warn("Should not receive unknown messages on client " +
+        m_log.warn("Should not receive unknown messages on client " +
             "transactions: "+request);
         }
 
     public void visitDoubleCrlfKeepAlive(final DoubleCrlfKeepAlive keepAlive)
         {
-        LOG.warn("Should not receive double CRLF keep alives on the client");
+        m_log.warn("Should not receive double CRLF keep alives on the client");
         }
     }
