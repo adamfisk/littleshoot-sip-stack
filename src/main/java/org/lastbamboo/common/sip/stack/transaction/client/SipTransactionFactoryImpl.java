@@ -1,7 +1,6 @@
 package org.lastbamboo.common.sip.stack.transaction.client;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Timer;
 
 import org.lastbamboo.common.offer.answer.OfferAnswerTransactionListener;
@@ -40,12 +39,8 @@ public class SipTransactionFactoryImpl implements SipTransactionFactory
     public SipClientTransaction createClientTransaction(
         final SipMessage request, final OfferAnswerTransactionListener listener)
         {
-        final List<OfferAnswerTransactionListener> transactionListeners = 
-            new LinkedList<OfferAnswerTransactionListener>();
-        transactionListeners.add(listener);
-        
         final SipClientTransaction ct = 
-            new SipClientTransactionImpl(request, transactionListeners, 
+            new SipClientTransactionImpl(request, Arrays.asList(listener), 
                 this.m_messageFactory, this.m_timerBThread, this.m_t1);
         this.m_transactionTracker.trackTransaction(ct);
         return ct;
