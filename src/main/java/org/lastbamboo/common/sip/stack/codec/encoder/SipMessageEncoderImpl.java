@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.littleshoot.mina.common.ByteBuffer;
+import org.littleshoot.util.mina.MinaCodecUtils;
 import org.lastbamboo.common.sip.stack.message.DoubleCrlfKeepAlive;
 import org.lastbamboo.common.sip.stack.message.Invite;
 import org.lastbamboo.common.sip.stack.message.Register;
@@ -19,7 +20,6 @@ import org.lastbamboo.common.sip.stack.message.SipResponse;
 import org.lastbamboo.common.sip.stack.message.UnknownSipRequest;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderValue;
-import org.lastbamboo.common.util.mina.MinaCodecUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

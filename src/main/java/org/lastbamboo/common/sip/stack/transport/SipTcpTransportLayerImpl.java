@@ -29,7 +29,7 @@ import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
 import org.lastbamboo.common.sip.stack.transaction.client.SipClientTransaction;
 import org.lastbamboo.common.sip.stack.transaction.client.SipTransactionFactory;
-import org.lastbamboo.common.util.NetworkUtils;
+import org.littleshoot.util.NetworkUtils;
 
 /**
  * The transport layer implementation for TCP.

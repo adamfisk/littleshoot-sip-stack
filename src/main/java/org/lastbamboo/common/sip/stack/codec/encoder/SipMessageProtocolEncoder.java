@@ -8,7 +8,7 @@ import org.littleshoot.mina.common.WriteFuture;
 import org.littleshoot.mina.filter.codec.ProtocolEncoder;
 import org.littleshoot.mina.filter.codec.ProtocolEncoderOutput;
 import org.lastbamboo.common.sip.stack.message.SipMessage;
-import org.lastbamboo.common.util.mina.MinaUtils;
+import org.littleshoot.util.mina.MinaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

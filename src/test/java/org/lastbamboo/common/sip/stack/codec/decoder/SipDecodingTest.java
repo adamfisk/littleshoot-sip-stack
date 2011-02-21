@@ -27,8 +27,8 @@ import org.lastbamboo.common.sip.stack.message.SipResponse;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactoryImpl;
-import org.lastbamboo.common.util.mina.ByteBufferUtils;
-import org.lastbamboo.common.util.mina.MinaUtils;
+import org.littleshoot.util.mina.ByteBufferUtils;
+import org.littleshoot.util.mina.MinaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

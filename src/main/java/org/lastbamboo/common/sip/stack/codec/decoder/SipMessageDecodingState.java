@@ -18,9 +18,9 @@ import org.lastbamboo.common.sip.stack.message.SipResponseFactory;
 import org.lastbamboo.common.sip.stack.message.UnknownSipRequestFactory;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
-import org.lastbamboo.common.util.mina.DecodingState;
-import org.lastbamboo.common.util.mina.DecodingStateMachine;
-import org.lastbamboo.common.util.mina.FixedLengthDecodingState;
+import org.littleshoot.util.mina.DecodingState;
+import org.littleshoot.util.mina.DecodingStateMachine;
+import org.littleshoot.util.mina.FixedLengthDecodingState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

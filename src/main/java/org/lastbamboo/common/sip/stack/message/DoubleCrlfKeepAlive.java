@@ -8,7 +8,7 @@ import org.littleshoot.mina.common.ByteBuffer;
 import org.lastbamboo.common.sip.stack.codec.SipMethod;
 import org.lastbamboo.common.sip.stack.message.header.SipHeader;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderValue;
-import org.lastbamboo.common.util.StringUtils;
+import org.littleshoot.util.StringUtils;
 
 /**
  * A SIP "message" that is just a double CRLF keep alive message, as specified

@@ -9,12 +9,12 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.littleshoot.mina.common.ByteBuffer;
 import org.littleshoot.mina.filter.codec.ProtocolDecoderOutput;
 import org.lastbamboo.common.sip.stack.codec.SipMessageType;
-import org.lastbamboo.common.util.mina.ConsumeToCrlfDecodingState;
-import org.lastbamboo.common.util.mina.ConsumeToLinearWhitespaceDecodingState;
-import org.lastbamboo.common.util.mina.ConsumeToTerminatorDecodingState;
-import org.lastbamboo.common.util.mina.DecodingState;
-import org.lastbamboo.common.util.mina.DecodingStateMachine;
-import org.lastbamboo.common.util.mina.MinaCodecUtils;
+import org.littleshoot.util.mina.ConsumeToCrlfDecodingState;
+import org.littleshoot.util.mina.ConsumeToLinearWhitespaceDecodingState;
+import org.littleshoot.util.mina.ConsumeToTerminatorDecodingState;
+import org.littleshoot.util.mina.DecodingState;
+import org.littleshoot.util.mina.DecodingStateMachine;
+import org.littleshoot.util.mina.MinaCodecUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

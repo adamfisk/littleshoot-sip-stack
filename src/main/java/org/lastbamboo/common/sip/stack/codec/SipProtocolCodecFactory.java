@@ -6,7 +6,7 @@ import org.littleshoot.mina.filter.codec.ProtocolEncoder;
 import org.lastbamboo.common.sip.stack.codec.decoder.SipMessageDecodingState;
 import org.lastbamboo.common.sip.stack.codec.encoder.SipMessageProtocolEncoder;
 import org.lastbamboo.common.sip.stack.message.header.SipHeaderFactory;
-import org.lastbamboo.common.util.mina.StateMachineProtocolDecoder;
+import org.littleshoot.util.mina.StateMachineProtocolDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

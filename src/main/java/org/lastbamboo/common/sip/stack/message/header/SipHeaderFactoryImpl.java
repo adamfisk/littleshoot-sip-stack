@@ -13,7 +13,7 @@ import org.apache.commons.id.uuid.UUID;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.lastbamboo.common.util.RuntimeIoException;
+import org.littleshoot.util.RuntimeIoException;
 
 /**
  * Factory for creating SIP headers.
