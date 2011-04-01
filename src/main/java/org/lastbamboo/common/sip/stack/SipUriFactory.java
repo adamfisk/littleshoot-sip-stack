@@ -1,26 +1,24 @@
 package org.lastbamboo.common.sip.stack;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
- * Factory for creating SIP <code>URI</code>s from user IDs.
+ * Factory for creating SIP URIs.
  */
-public interface SipUriFactory {
+public final class SipUriFactory {
 
-    /**
-     * Creates a SIP URI for the user with the specified ID.
-     * 
-     * @param id The ID of the user to create a SIP URI for.
-     * @return The URI for the user.
-     */
-    URI createSipUri(String id);
+    public static URI createSipUri(final String id) {
+        final String sipUriString = "sip:" + id + "@lastbamboo.org";
+        try {
+            return new URI(sipUriString);
+        } catch (final URISyntaxException e) {
+            throw new IllegalArgumentException("Invalid request string: "+id);
+        }
+    }
 
-    /**
-     * Creates a SIP URI for the user with the specified ID.
-     * 
-     * @param id The ID of the user to create a SIP URI for.
-     * @return The URI for the user.
-     */
-    URI createSipUri(long id);
+    public static URI createSipUri(final long id) {
+        return createSipUri(Long.toString(id));
+    }
 
 }
