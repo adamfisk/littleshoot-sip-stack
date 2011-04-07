@@ -9,7 +9,7 @@ import java.net.URISyntaxException;
 public final class SipUriFactory {
 
     public static URI createSipUri(final String id) {
-        final String sipUriString = "sip:" + id + "@lastbamboo.org";
+        final String sipUriString = "sip:" + id + "@littleshoot.org";
         try {
             return new URI(sipUriString);
         } catch (final URISyntaxException e) {
