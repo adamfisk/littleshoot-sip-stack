@@ -18,8 +18,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Abstracts out generalized functions common to all SIP messages.
  */
-public abstract class AbstractSipMessage implements SipMessage
-    {
+public abstract class AbstractSipMessage implements SipMessage {
 
     private static final Logger LOG = 
         LoggerFactory.getLogger(AbstractSipMessage.class);
@@ -43,72 +42,62 @@ public abstract class AbstractSipMessage implements SipMessage
      * @param body The message body.
      */
     public AbstractSipMessage(final String startLine, final SipMethod method,
-        final Map<String, SipHeader> headers, final ByteBuffer body)
-        {
+            final Map<String, SipHeader> headers, final ByteBuffer body) {
         this.m_startLine = startLine;
         this.m_headers = headers;
         this.m_method = method;
-        this.m_messageBody = body.asReadOnlyBuffer();        
-        }
+        this.m_messageBody = body.asReadOnlyBuffer();
+    }
 
-    public AbstractSipMessage(final SipMethod method, final URI requestUri, 
-        final Map<String, SipHeader> headers)
-        {
+    public AbstractSipMessage(final SipMethod method, final URI requestUri,
+            final Map<String, SipHeader> headers) {
         this(method, requestUri, headers, EMPTY_BODY);
-        }
+    }
 
-    public AbstractSipMessage(final SipMethod method, final URI requestUri, 
-        final Map<String, SipHeader> headers, final ByteBuffer body)
-        {
+    public AbstractSipMessage(final SipMethod method, final URI requestUri,
+            final Map<String, SipHeader> headers, final ByteBuffer body) {
         this(createRequestLine(method, requestUri), method, headers, body);
-        }
+    }
 
-    public AbstractSipMessage(final int statusCode, final String reasonPhrase, 
-        final Map<String, SipHeader> headers, final ByteBuffer body)
-        {
-        this(createResponseStatusLine(statusCode, reasonPhrase), 
-            createMethod(headers), headers, body);
-        }
-    
-    public AbstractSipMessage(final int statusCode, final String reasonPhrase, 
-        final Map<String, SipHeader> headers)
-        {
-        this(createResponseStatusLine(statusCode, reasonPhrase), 
-            createMethod(headers), headers, EMPTY_BODY);
-        }
+    public AbstractSipMessage(final int statusCode, final String reasonPhrase,
+            final Map<String, SipHeader> headers, final ByteBuffer body) {
+        this(createResponseStatusLine(statusCode, reasonPhrase),
+                createMethod(headers), headers, body);
+    }
 
-    private static SipMethod createMethod(final Map<String, SipHeader> headers)
-        {
+    public AbstractSipMessage(final int statusCode, final String reasonPhrase,
+            final Map<String, SipHeader> headers) {
+        this(createResponseStatusLine(statusCode, reasonPhrase),
+                createMethod(headers), headers, EMPTY_BODY);
+    }
+
+    private static SipMethod createMethod(final Map<String, SipHeader> headers) {
         final SipHeader cseq = headers.get(SipHeaderNames.CSEQ);
         final String methodString = SipMessageUtils.extractCSeqMethod(cseq);
         return SipMethod.valueOf(methodString);
-        }
+    }
 
-    private static String createResponseStatusLine(final int statusCode, 
-        final String reasonPhrase)
-        {
+    private static String createResponseStatusLine(final int statusCode,
+            final String reasonPhrase) {
         final StringBuilder sb = new StringBuilder();
         sb.append(SipMessageType.SIP_2_0.convert());
         sb.append(" ");
         sb.append(statusCode);
         sb.append(" ");
         sb.append(reasonPhrase);
-        if (LOG.isDebugEnabled())
-            {
-            LOG.debug("Returning response line: "+sb.toString());
-            }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Returning response line: " + sb.toString());
+        }
         return sb.toString();
-        }
+    }
 
-    private static String createRequestLine(final SipMethod method, 
-        final URI requestUri)
-        {
+    private static String createRequestLine(final SipMethod method,
+            final URI requestUri) {
         return createRequestLine(method.name(), requestUri);
-        }
-    
-    protected static String createRequestLine(final String method, 
-        final URI requestUri)
-        {
+    }
+
+    protected static String createRequestLine(final String method,
+            final URI requestUri) {
         final StringBuilder sb = new StringBuilder();
         sb.append(method);
         sb.append(" ");
@@ -116,68 +105,60 @@ public abstract class AbstractSipMessage implements SipMessage
         sb.append(" ");
         sb.append(SipMessageType.SIP_2_0.convert());
         return sb.toString();
-        }
-    
+    }
 
-    public SipHeader getHeader(final String headerName) 
-        {
+    public SipHeader getHeader(final String headerName) {
         return this.m_headers.get(headerName);
-        }
-    
-    public Map<String, SipHeader> getHeaders()
-        {
+    }
+
+    public Map<String, SipHeader> getHeaders() {
         // Return a copy of the headers to preserve the immutability of this
-        // class.  This will only really get called when we're making a copy
+        // class. This will only really get called when we're making a copy
         // of a message any way, so we might as well just make a copy.
-        synchronized (this.m_headers)
-            {
+        synchronized (this.m_headers) {
             return new ConcurrentHashMap<String, SipHeader>(this.m_headers);
-            }
         }
-    
-    public ByteBuffer getBody()
-        {
+    }
+
+    public ByteBuffer getBody() {
         return this.m_messageBody;
-        }
-    
-    public final String getBranchId()
-        {
+    }
+
+    public final String getBranchId() {
         final SipHeader via = this.m_headers.get(SipHeaderNames.VIA);
         return via.getValue().getParamValue("branch");
-        }
+    }
 
-    public final SipMethod getMethod()
-        {
+    public final SipMethod getMethod() {
         return this.m_method;
-        }
+    }
 
-    public List<SipHeaderValue> getRouteSet()
-        {
-        final SipHeader recordRoute = 
-            this.m_headers.get(SipHeaderNames.RECORD_ROUTE);
-        
-        if (recordRoute == null)
-            {
+    public List<SipHeaderValue> getRouteSet() {
+        final SipHeader recordRoute = this.m_headers
+                .get(SipHeaderNames.RECORD_ROUTE);
+
+        if (recordRoute == null) {
             return Collections.emptyList();
-            }
+        }
         return recordRoute.getValues();
-        }
-    
-    public String getStartLine() 
-        {
-        return this.m_startLine;
-        }
+    }
 
-    public String getTransactionKey()
-        {
+    public String getStartLine() {
+        return this.m_startLine;
+    }
+
+    public String getTransactionKey() {
         final String branchId = getBranchId();
         final SipMethod method = getMethod();
         return branchId + method.toString();
-        }
+    }
 
     @Override
-    public String toString()
-        {
+    public String toString() {
         return getClass().getSimpleName();
-        }
     }
+
+    public byte[] getKey() {
+        return null;
+    }
+}

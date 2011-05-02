@@ -67,4 +67,9 @@ public class SipMessageStub implements SipMessage
         // TODO Auto-generated method stub
         return null;
     }
+
+    public byte[] getKey() {
+        // TODO Auto-generated method stub
+        return null;
+    }
     }

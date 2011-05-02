@@ -16,56 +16,50 @@ import org.littleshoot.util.StringUtils;
  *
  * http://www.ietf.org/internet-drafts/draft-ietf-sip-outbound-08.txt
  */
-public class DoubleCrlfKeepAlive implements SipMessage
-    {
+public class DoubleCrlfKeepAlive implements SipMessage {
 
     private static final ByteBuffer DOUBLE_CRLF = 
         ByteBuffer.wrap(StringUtils.toAsciiBytes("\r\n\r\n"));
-    
-    public void accept(final SipMessageVisitor visitor)
-        {
+
+    public void accept(final SipMessageVisitor visitor) {
         visitor.visitDoubleCrlfKeepAlive(this);
-        }
+    }
 
-    public ByteBuffer getBody()
-        {
+    public ByteBuffer getBody() {
         return DOUBLE_CRLF.duplicate();
-        }
+    }
 
-    public String getBranchId()
-        {
+    public String getBranchId() {
         return org.apache.commons.lang.StringUtils.EMPTY;
-        }
+    }
 
-    public SipHeader getHeader(final String headerName)
-        {
+    public SipHeader getHeader(final String headerName) {
         return null;
-        }
+    }
 
-    public Map<String, SipHeader> getHeaders()
-        {
+    public Map<String, SipHeader> getHeaders() {
         return Collections.emptyMap();
-        }
+    }
 
-    public SipMethod getMethod()
-        {
+    public SipMethod getMethod() {
         return SipMethod.DOUBLE_CRLF_KEEP_ALIVE;
-        }
+    }
 
-    public List<SipHeaderValue> getRouteSet()
-        {
+    public List<SipHeaderValue> getRouteSet() {
         return Collections.emptyList();
-        }
-    
-    public String getStartLine()
-        {
-        return org.apache.commons.lang.StringUtils.EMPTY;
-        }
+    }
 
-    public String getTransactionKey()
-        {
+    public String getStartLine() {
+        return org.apache.commons.lang.StringUtils.EMPTY;
+    }
+
+    public String getTransactionKey() {
         final String branchId = getBranchId();
         final SipMethod method = getMethod();
         return branchId + method.toString();
-        }
     }
+
+    public byte[] getKey() {
+        return null;
+    }
+}
