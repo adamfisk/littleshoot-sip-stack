@@ -47,33 +47,15 @@
     <dependencies>
 
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>r08</version>
-        </dependency>
-
-        <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
             <version>3.2.1</version>
         </dependency>
 
         <dependency>
-            <groupId>commons-discovery</groupId>
-            <artifactId>commons-discovery</artifactId>
-            <version>0.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-id</groupId>
-            <artifactId>commons-id</artifactId>
-            <version>0.1</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.littleshoot</groupId>
             <artifactId>mina-port</artifactId>
-            <version>1.0</version>
+            <version>${mina.port.version}</version>
         </dependency> 
 
         <dependency>
