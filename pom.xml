@@ -3,14 +3,14 @@
     <groupId>org.littleshoot</groupId>
     <artifactId>sip-stack</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
     <name>LittleShoot SIP Stack</name>
     <url>http://www.littleshoot.org</url>
 
     <parent>
         <groupId>org.littleshoot</groupId>
         <artifactId>parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.3</version>
     </parent>
 
     <scm>
@@ -29,30 +29,26 @@
 
         <dependency>
             <groupId>org.littleshoot</groupId>
-            <artifactId>mina-port</artifactId>
-        </dependency> 
-
-        <dependency>
-            <groupId>org.littleshoot</groupId>
             <artifactId>mina-util</artifactId>
+            <version>${ls.version}</version>
         </dependency> 
 
         <dependency>
             <groupId>org.littleshoot</groupId>
             <artifactId>offer-answer</artifactId>
-            <version>${project.version}</version>
+            <version>${ls.version}</version>
         </dependency> 
 
         <dependency>
             <groupId>org.littleshoot</groupId>
             <artifactId>stun-stack</artifactId>
-            <version>${project.version}</version>
+            <version>${ls.version}</version>
         </dependency> 
 
         <dependency>
             <groupId>org.littleshoot</groupId>
             <artifactId>util</artifactId>
-            <version>${project.version}</version>
+            <version>${ls.version}</version>
         </dependency> 
 
     </dependencies>
